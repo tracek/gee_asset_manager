@@ -1,6 +1,9 @@
 # Google Earth Engine batch asset uploader
 Google Earth Engine batch asset manager ambition is helping user with batch actions on assets. It will be developed on use case basis, so if there's something missing feel free to post a feature request in [Issues](https://github.com/tracek/gee_asset_manager/issues) tab.
 
+## Prerequisites
+We assume Earth Engine Python API is installed and EE authorised as desribed [here](https://developers.google.com/earth-engine/python_install).
+
 ## Batch uploader
 The script creates an Image Collection from GeoTIFFs in your local directory. By default, the collection name is the same as the local directory name; with optional parameter you can provide a different name. Another optional parameter is a path to a CSV file with metadata for images, which is covered in the next section: [Parsing metadata](#parsing-metadata).
 
@@ -57,3 +60,4 @@ The program will match the file names from the upload directory with ones provid
 ```
 python batch_uploader -u my_account@gmail.com -d path_to_directory_with_tif -p path_to_metadata.csv
 ```
+The script will prompt the user for Google account password. 
