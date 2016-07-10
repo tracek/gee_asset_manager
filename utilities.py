@@ -1,7 +1,10 @@
 import logging
 
+import ee
 
-def delete_collection(ee, id):
+
+def delete_collection(id):
+    ee.Initialize()
     logging.info('Attempting to delete collection %s', id)
     if 'users' not in id:
         root_path_in_gee = ee.data.getAssetRoots()[0]['id']
@@ -14,9 +17,12 @@ def delete_collection(ee, id):
     logging.info('Collection %s removed', id)
 
 
-def cancel_all_running_tasks(ee):
+def cancel_all_running_tasks():
+    ee.Initialize()
     logging.info('Attempting to cancel all running tasks')
     running_tasks = [task for task in ee.data.getTaskList() if task['state'] == 'RUNNING']
     for task in running_tasks:
         ee.data.cancelTask(task['id'])
     logging.info('Cancel all request completed')
+
+
