@@ -122,16 +122,19 @@ def get_number_of_running_tasks(ee):
     return len([task for task in ee.data.getTaskList() if task['state'] == 'RUNNING'])
 
 
-def wait_for_tasks_to_complete(ee, waiting_time=10, no_allowed_tasks_running=8):
+def wait_for_tasks_to_complete(ee, waiting_time=10, no_allowed_tasks_running=20):
     tasks_running = get_number_of_running_tasks(ee)
     if tasks_running > no_allowed_tasks_running:
+        logging.info('Number of running tasks is %d. Sleeping for %d s until it goes down to %d',
+                     tasks_running, waiting_time, no_allowed_tasks_running)
         time.sleep(waiting_time)
         wait_for_tasks_to_complete(ee, waiting_time, no_allowed_tasks_running)
 
 
 def periodic_wait(ee, current_image, period):
-    if current_image + 1 % period == 0:
+    if (current_image + 1) % period == 0:
         # Time to check how many tasks are running!
+        logging.info('Periodic check for number of running tasks is due')
         wait_for_tasks_to_complete(ee)
 
 
