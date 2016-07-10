@@ -119,11 +119,13 @@ def get_filename_from_path(path):
 
 def main(argv):
     setup_logging(path='logconfig.json')
-    parser = argparse.ArgumentParser(description='Google Earth Engine Asset Manager', prog='GEE asset manager')
-    parser.add_argument('-u', '--user', help='Google account name (gmail address)', required=True)
-    parser.add_argument('-d', '--directory', help='Path to the directory with images', required=True)
-    parser.add_argument('-p', '--properties', help='Path to CSV with metadata')
-    parser.add_argument('-c', '--collection', help='Name of the collection to create')
+    parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Uploader', prog='GEE asset manager')
+    required_named = parser.add_argument_group('Required named arguments')
+    required_named.add_argument('-u', '--user', help='Google account name (gmail address)', required=True)
+    required_named.add_argument('-d', '--directory', help='Path to the directory with images', required=True)
+    optional_named = parser.add_argument_group('Optional named arguments')
+    optional_named.add_argument('-p', '--properties', help='Path to CSV with metadata')
+    optional_named.add_argument('-c', '--collection', help='Name of the collection to create')
     args = parser.parse_args()
 
     image_collection_name = args.collection or get_filename_from_path(args.directory)

@@ -7,6 +7,11 @@ setup(
     url='https://github.com/tracek/gee_asset_manager',
     license='Apache 2.0',
     author='Lukasz Tracewski',
-    author_email='lukasz.tracewski@gmail.com',
-    description='Google Earth Engine assets manager'
+    author_email='lukasz.tracewski@outlook.com',
+    description='Google Earth Engine assets manager',
+    install_requires=[
+        'earthengine_api',
+        'requests',
+        'ee'
+    ]
 )
