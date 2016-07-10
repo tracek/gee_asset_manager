@@ -6,6 +6,7 @@ import logging
 import logging.config
 import os
 import sys
+import time
 import urllib
 from getpass import getpass
 
@@ -117,6 +118,23 @@ def get_filename_from_path(path):
     return os.path.splitext(os.path.basename(os.path.normpath(path)))[0]
 
 
+def get_number_of_running_tasks(ee):
+    return len([task for task in ee.data.getTaskList() if task['state'] == 'RUNNING'])
+
+
+def wait_for_tasks_to_complete(ee, waiting_time=10, no_allowed_tasks_running=8):
+    tasks_running = get_number_of_running_tasks(ee)
+    if tasks_running > no_allowed_tasks_running:
+        time.sleep(waiting_time)
+        wait_for_tasks_to_complete(ee, waiting_time, no_allowed_tasks_running)
+
+
+def periodic_wait(ee, current_image, period):
+    if current_image + 1 % period == 0:
+        # Time to check how many tasks are running!
+        wait_for_tasks_to_complete(ee)
+
+
 def main(argv):
     setup_logging(path='logconfig.json')
     parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Uploader', prog='GEE asset manager')
@@ -143,9 +161,11 @@ def main(argv):
     google_session = get_google_auth_session(args.user, password)
 
     metadata = load_metadata_from_csv(args.properties)
+    all_images_paths = glob.glob(os.path.join(args.directory, '*.tif'))
+    no_images = len(all_images_paths)
 
-    for image in glob.glob(os.path.join(args.directory, '*.tif')):
-        logging.info('Processing %s', image)
+    for current_image_no, image in enumerate(all_images_paths):
+        logging.info('Processing image %d out of %d: %s', current_image_no, no_images, image)
         filename = get_filename_from_path(path=image)
         properties = metadata[filename]
         asset_request = upload_file(session=google_session,
@@ -154,6 +174,7 @@ def main(argv):
                                     properties=properties)
         task_id = ee.data.newTaskId(1)[0]
         r = ee.data.startIngestion(task_id, asset_request)
+        periodic_wait(ee, current_image=current_image_no, period=50)
 
 
 if __name__ == '__main__':
