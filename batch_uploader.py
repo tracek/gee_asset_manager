@@ -96,8 +96,8 @@ def upload_file(session, file_path, asset_name, properties=None):
                       ]}
                   ],
                   "bands": [],
-                  "properties": properties,
-                  "reductionPolicy": "MEAN"}
+                  "properties": properties
+                  }
     return asset_data
 
 
