@@ -122,7 +122,7 @@ def get_number_of_running_tasks(ee):
     return len([task for task in ee.data.getTaskList() if task['state'] == 'RUNNING'])
 
 
-def wait_for_tasks_to_complete(ee, waiting_time=10, no_allowed_tasks_running=20):
+def wait_for_tasks_to_complete(ee, waiting_time=10, no_allowed_tasks_running=8):
     tasks_running = get_number_of_running_tasks(ee)
     if tasks_running > no_allowed_tasks_running:
         logging.info('Number of running tasks is %d. Sleeping for %d s until it goes down to %d',
