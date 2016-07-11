@@ -1,5 +1,4 @@
 import argparse
-import csv
 import glob
 import json
 import logging
@@ -12,33 +11,6 @@ from getpass import getpass
 
 import ee
 import requests
-
-
-def load_metadata_from_csv(path):
-    """
-    Grabs properties from the give csv file. The csv should be organised as follows:
-    filename (without extension), property1, property2, ...
-
-    Example:
-    id_no,class,category,binomial
-    my_file_1,GASTROPODA,EN,Aaadonta constricta
-    my_file_2,GASTROPODA,CR,Aaadonta irregularis
-
-    The corresponding files are my_file_1.tif and my_file_2.tif.
-
-    The program will turn the above into a json object:
-
-    { id_no: my_file_1, class: GASTROPODA, category: EN, binomial: Aaadonta constricta},
-    { id_no: my_file_2, class: GASTROPODA, category: CR, binomial: Aaadonta irregularis}
-
-    :param path to csv:
-    :return: dictionary of dictionaries
-    """
-    with open(path, mode='r') as metadata_file:
-        reader = csv.reader(metadata_file)
-        header = reader.next()
-        metadata = {row[0]: dict(zip(header, row)) for row in reader}
-        return metadata
 
 
 def setup_logging(path, default_level=logging.INFO):
