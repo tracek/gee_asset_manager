@@ -1,4 +1,10 @@
 import csv
+import logging
+import re
+
+
+class IllegalPropertyName(Exception):
+    pass
 
 
 def load_metadata_from_csv(path):
@@ -24,33 +30,45 @@ def load_metadata_from_csv(path):
     with open(path, mode='r') as metadata_file:
         reader = csv.reader(metadata_file)
         header = reader.next()
-        metadata = {row[0]: dict(zip(header, row)) for row in reader}
+
+        if not properties_allowed(properties=header, validator=allowed_property_key):
+            raise IllegalPropertyName()
+
+        metadata = {row[0]: dict(zip(header, row)) for row in reader
+                    if properties_allowed(properties=row, validator=allowed_property_value)}
         return metadata
 
-def validate_against_metadata(met, paths):
-    """
-    Checks the list of images to ensure that a metadata entry exists for each one
-    if this is not the case, remove that image from the upload list.
-    Also check for blank values in the metadata fields, which will cause Property KeyErrors on GEE
-    Behaviour at the moment is to stop the upload if either type of errors is found, to allow the user to edit the file.
-    :param met - a dictionary of dictionaries containing the metadata entries:
-    :param paths - a list of full filepaths:
-    :return: updated list of full filepaths
-    """
-    filter_list = []
-    for filepath in paths:
-        filename = get_filename_from_path(filepath)
-        if filename not in met:
-            # add the file path to the list that should be filtered out
-            filter_list.append(filepath)
-            logging.warning("No metadata exists for image %s: it will not be ingested", filename)
-    # keeping this bit so that the user can specify whether this is a problem TODO
-    result = filter(lambda x: x not in filter_list, paths)
-    if len(filter_list) >0:
-        return None
-    # Now check for empty values in the metadata - these will throw errors on the Earth Engine side
-    for key in met:
-        for k, value in met[key].iteritems():
-            if value is None or value == '':
-                logging.warning("Found an empty value for item %s - field %s" % (key, k))
-                return None
+
+def properties_allowed(properties, validator):
+    return all(validator(prop) for prop in properties)
+
+
+def allowed_property_value(prop):
+    if prop:
+        return True
+    else:
+        logging.warning('Illegal property: empty string')
+        return False
+
+
+def allowed_property_key(prop):
+    google_special_properties = ('system:description',
+                                 'system:provider_url',
+                                 'system:tags',
+                                 'system:time_end',
+                                 'system:time_start',
+                                 'system:title')
+
+    if prop in google_special_properties or re.match("^[A-Za-z0-9_]+$", prop):
+        return True
+    else:
+        logging.warning('Property name %s is invalid. Special properties [system:description, system:provider_url, '
+                        'system:tags, system:time_end, system:time_start, system:title] are allowed; other property '
+                        'keys must contain only letters, digits and underscores.')
+        return False
+
+
+def is_legal_gee_metadata(row):
+    key = row[0]
+    values = row[1:]
+    re.match("^[A-Za-z0-9_]+$", ' asss_sasa')

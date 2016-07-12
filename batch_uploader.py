@@ -12,6 +12,8 @@ from getpass import getpass
 import ee
 import requests
 
+import metadata_loader
+
 
 def setup_logging(path, default_level=logging.INFO):
     if os.path.exists(path):
@@ -135,7 +137,7 @@ def main(argv):
 
     google_session = get_google_auth_session(args.user, password)
 
-    metadata = load_metadata_from_csv(args.properties)
+    metadata = metadata_loader.load_metadata_from_csv(args.properties)
     all_images_paths = glob.glob(os.path.join(args.directory, '*.tif'))
     no_images = len(all_images_paths)
 
