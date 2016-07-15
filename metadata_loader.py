@@ -30,10 +30,10 @@ def load_metadata_from_csv(path, directory):
     Also check for blank values in the metadata fields, which will cause Property KeyErrors on GEE
     Behaviour at the moment is to stop the upload if blank fields are found, to allow the user to edit the file.
     If images are present without metadata, the user can inspect the warnings to generate metadata rows for those images.
-    :param met - a dictionary of dictionaries containing the metadata entries:
 
     :param path to csv:
-    :return: dictionary of dictionaries:
+    :param directory - the directory in which the images are to be found:
+    :return: a dictionary of dictionaries containing the metadata entries:
     :return: list of full filepaths to upload
     """
     with open(path, mode='r') as metadata_file:
