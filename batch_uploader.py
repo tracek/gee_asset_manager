@@ -1,5 +1,4 @@
 import argparse
-import glob
 import json
 import logging
 import logging.config
@@ -136,22 +135,27 @@ def main(argv):
     password = getpass()
 
     google_session = get_google_auth_session(args.user, password)
+    
+    metadata, all_images_paths = metadata_loader.load_metadata_from_csv(args.properties, args.directory)
 
-    metadata = metadata_loader.load_metadata_from_csv(args.properties)
-    all_images_paths = glob.glob(os.path.join(args.directory, '*.tif'))
     no_images = len(all_images_paths)
 
     for current_image_no, image in enumerate(all_images_paths):
         logging.info('Processing image %d out of %d: %s', current_image_no, no_images, image)
         filename = get_filename_from_path(path=image)
         properties = metadata[filename]
-        asset_request = upload_file(session=google_session,
-                                    file_path=image,
-                                    asset_name=os.path.join(full_path_to_collection, filename),
-                                    properties=properties)
-        task_id = ee.data.newTaskId(1)[0]
-        r = ee.data.startIngestion(task_id, asset_request)
-        periodic_wait(ee, current_image=current_image_no, period=50)
+        # check whether the asset exists already
+        a_name=os.path.join(full_path_to_collection, filename)
+        if collection_exist(a_name):
+            logging.warning("Asset %s already exists: not uploading", filename)
+        else:
+            asset_request = upload_file(session=google_session,
+                                        file_path=image,
+                                        asset_name=a_name,
+                                        properties=properties)
+            task_id = ee.data.newTaskId(1)[0]
+            r = ee.data.startIngestion(task_id, asset_request)
+            periodic_wait(ee, current_image=current_image_no, period=50)
 
 
 if __name__ == '__main__':
