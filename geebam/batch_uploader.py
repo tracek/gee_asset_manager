@@ -1,9 +1,9 @@
+import getpass
 import glob
 import logging
 import os
 import sys
 import urllib
-import getpass
 
 import ee
 import requests

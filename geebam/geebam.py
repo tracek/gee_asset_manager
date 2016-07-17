@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 
 import argparse
+import json
 import logging
 import logging.config
 import os
-import json
 import sys
 
 import ee
@@ -58,8 +58,8 @@ def upload_from_parser(args):
                           collection_name=args.collection or get_filename_from_path(args.directory))
 
 
-def main(argv):
-    setup_logging(path='logconfig.json')
+def main(args=None):
+    setup_logging(path=os.path.join(os.path.dirname(__file__), 'logconfig.json'))
     ee.Initialize()
     parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Manager', prog='GEE asset manager')
 
@@ -85,4 +85,4 @@ def main(argv):
     args.func(args)
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
