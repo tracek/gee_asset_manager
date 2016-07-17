@@ -7,6 +7,7 @@ import getpass
 
 import ee
 import requests
+import retrying
 
 import helper_functions
 import metadata_loader
@@ -17,6 +18,9 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
     Google's account name and password.
+
+    In case any exception happens during the upload, the function will repeat the call a given number of times, after
+    which the error will be propagated further.
 
     :param user: name of a Google account
     :param path_for_upload: path to a directory
@@ -43,13 +47,25 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
         filename = helper_functions.get_filename_from_path(path=image_path)
         properties = metadata[filename] if metadata else None
-        asset_request = __upload_file(session=google_session,
-                                      file_path=image_path,
-                                      asset_name=os.path.join(full_path_to_collection, filename),
-                                      properties=properties)
-        task_id = ee.data.newTaskId(1)[0]
-        r = ee.data.startIngestion(task_id, asset_request)
-        __periodic_wait(current_image=current_image_no, period=50)
+        try:
+            r = __upload_to_gcs_and_start_ingestion_task(current_image_no, filename, full_path_to_collection,
+                                                         google_session, image_path, properties)
+        except Exception as e:
+            logging.critical('Upload of %s has failed. Moving on...', filename)
+
+
+
+@retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=5)
+def __upload_to_gcs_and_start_ingestion_task(current_image_no, filename, full_path_to_collection, google_session,
+                                             image_path, properties):
+    asset_request = __upload_file(session=google_session,
+                                  file_path=image_path,
+                                  asset_name=os.path.join(full_path_to_collection, filename),
+                                  properties=properties)
+    task_id = ee.data.newTaskId(1)[0]
+    r = ee.data.startIngestion(task_id, asset_request)
+    __periodic_wait(current_image=current_image_no, period=50)
+    return r
 
 
 def __validate_metadata(path_for_upload, metadata_path):
