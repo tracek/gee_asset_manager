@@ -2,6 +2,7 @@ import os
 import logging
 import ee
 import time
+import sys
 
 
 def get_filename_from_path(path):

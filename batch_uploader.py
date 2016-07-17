@@ -25,6 +25,8 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
     :return:
     """
 
+    metadata = metadata_loader.load_metadata_from_csv(metadata_path) if metadata_path else None
+
     password = getpass.getpass()
     google_session = __get_google_auth_session(user, password)
 
@@ -34,21 +36,49 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
 
     helper_functions.create_image_collection(full_path_to_collection)
 
-    metadata = metadata_loader.load_metadata_from_csv(metadata_path)
     all_images_paths = glob.glob(os.path.join(path_for_upload, '*.tif'))
     no_images = len(all_images_paths)
 
-    for current_image_no, image in enumerate(all_images_paths):
-        logging.info('Processing image %d out of %d: %s', current_image_no, no_images, image)
-        filename = helper_functions.get_filename_from_path(path=image)
-        properties = metadata[filename]
+    for current_image_no, image_path in enumerate(all_images_paths):
+        logging.info('Processing image %d out of %d: %s', current_image_no, no_images, image_path)
+        filename = helper_functions.get_filename_from_path(path=image_path)
+        properties = metadata[filename] if metadata else None
         asset_request = __upload_file(session=google_session,
-                                      file_path=image,
+                                      file_path=image_path,
                                       asset_name=os.path.join(full_path_to_collection, filename),
                                       properties=properties)
         task_id = ee.data.newTaskId(1)[0]
         r = ee.data.startIngestion(task_id, asset_request)
         __periodic_wait(current_image=current_image_no, period=50)
+
+
+def __validate_metadata(path_for_upload, metadata_path):
+    validation_result = metadata_loader.validate_metadata_from_csv(metadata_path)
+    keys_in_metadata = {result.keys for result in validation_result}
+    images_paths = glob.glob(os.path.join(path_for_upload, '*.tif'))
+    keys_in_data = {helper_functions.get_filename_from_path(path) for path in images_paths}
+    missing_keys = keys_in_data - keys_in_metadata
+
+    if missing_keys:
+        logging.warning('%d images does not have a corresponding key in metadata', len(missing_keys))
+        print('\n'.join(e for e in missing_keys))
+    else:
+        logging.info('All images have metadata available')
+
+    if not validation_result.success:
+        print('Validation finished with errors. Type "y" to continue, default NO: ')
+        choice = raw_input().lower()
+        if choice not in ['y', 'yes']:
+            logging.info('Application will terminate')
+            exit(1)
+
+
+def __extract_metadata_for_image(filename, metadata):
+    if filename in metadata:
+        return metadata[filename]
+    else:
+        logging.warning('Metadata for %s not found', filename)
+        return None
 
 
 def __get_google_auth_session(username, password):

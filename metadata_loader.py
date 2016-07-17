@@ -1,6 +1,10 @@
 import csv
 import logging
 import re
+import collections
+
+
+ValidationResult = collections.namedtuple('ValidationResult', ['success', 'keys'])
 
 
 class IllegalPropertyName(Exception):
@@ -13,23 +17,25 @@ def validate_metadata_from_csv(path):
     :param path:
     :return: true / false
     """
+    all_keys = []
+
     with open(path, mode='r') as metadata_file:
         logging.info('Running metatdata validator for %s', path)
-        validation_result = True
+        success = True
         reader = csv.reader(metadata_file)
         header = reader.next()
 
         if not properties_allowed(properties=header, validator=allowed_property_key):
-            validation_result = False
+            raise IllegalPropertyName('The header has illegal name.')
 
         for row in reader:
+            all_keys.append(row[0])
             if not properties_allowed(properties=row, validator=allowed_property_value):
-                validation_result = False
+                success = False
 
-        if validation_result == True: logging.info('Validation successful')
-        else: logging.error('Validation failed')
+        logging.info('Validation successful') if success else logging.error('Validation failed')
 
-        return validation_result
+        return ValidationResult(success=success, keys=all_keys)
 
 
 def load_metadata_from_csv(path):

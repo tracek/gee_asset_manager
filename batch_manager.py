@@ -70,7 +70,7 @@ def main(argv):
     required_named.add_argument('-u', '--user', help='Google account name (gmail address).', required=True)
     required_named.add_argument('-d', '--directory', help='Path to the directory with images.', required=True)
     optional_named = parser_upload.add_argument_group('Optional named arguments')
-    optional_named.add_argument('-p', '--properties', help='Path to CSV with metadata.')
+    optional_named.add_argument('-m', '--metadata', help='Path to CSV with metadata.')
     optional_named.add_argument('-c', '--collection', help='Name of the collection to create. If not provided, '
                                                            'directory name will be used.')
     parser_upload.set_defaults(func=parser_upload)
