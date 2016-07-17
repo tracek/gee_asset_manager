@@ -40,7 +40,7 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
     no_images = len(all_images_paths)
 
     for current_image_no, image_path in enumerate(all_images_paths):
-        logging.info('Processing image %d out of %d: %s', current_image_no, no_images, image_path)
+        logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
         filename = helper_functions.get_filename_from_path(path=image_path)
         properties = metadata[filename] if metadata else None
         asset_request = __upload_file(session=google_session,

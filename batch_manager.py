@@ -43,29 +43,30 @@ def get_filename_from_path(path):
     return os.path.splitext(os.path.basename(os.path.normpath(path)))[0]
 
 
-def parser_cancel_all_running_tasks(args):
+def cancel_all_running_tasks_from_parser(args):
     cancel_all_running_tasks()
 
 
-def parser_delete_collection(args):
+def delete_collection_from_parser(args):
     delete_collection(args.id)
 
 
-def parser_upload(args):
+def upload_from_parser(args):
     batch_uploader.upload(user=args.user,
                           path_for_upload=args.directory,
-                          metadata_path=args.metadata_path,
+                          metadata_path=args.metadata,
                           collection_name=args.collection or get_filename_from_path(args.directory))
 
 
 def main(argv):
     setup_logging(path='logconfig.json')
+    ee.Initialize()
     parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Manager', prog='GEE asset manager')
 
     subparsers = parser.add_subparsers()
     parser_delete = subparsers.add_parser('delete', help='Deletes collection and all items inside.')
     parser_delete.add_argument('id', help='ID of the collection, either fully qualified or abbreviated (no need to pass users/username).')
-    parser_delete.set_defaults(func=parser_delete_collection)
+    parser_delete.set_defaults(func=delete_collection_from_parser)
 
     parser_upload = subparsers.add_parser('upload', help='Batch Asset Uploader.')
     required_named = parser_upload.add_argument_group('Required named arguments.')
@@ -75,13 +76,12 @@ def main(argv):
     optional_named.add_argument('-m', '--metadata', help='Path to CSV with metadata.')
     optional_named.add_argument('-c', '--collection', help='Name of the collection to create. If not provided, '
                                                            'directory name will be used.')
-    parser_upload.set_defaults(func=parser_upload)
+    parser_upload.set_defaults(func=upload_from_parser)
 
     parser_cancel = subparsers.add_parser('cancel', help='Cancel all running tasks')
-    parser_cancel.set_defaults(func=parser_cancel_all_running_tasks)
+    parser_cancel.set_defaults(func=cancel_all_running_tasks_from_parser)
 
     args = parser.parse_args()
-    ee.Initialize()
     args.func(args)
 
 if __name__ == '__main__':
