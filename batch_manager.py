@@ -79,8 +79,8 @@ def main(argv):
     parser_cancel.set_defaults(func=parser_cancel_all_running_tasks)
 
     args = parser.parse_args()
-    args.func(args)
     ee.Initialize()
+    args.func(args)
 
 if __name__ == '__main__':
     main(sys.argv)
