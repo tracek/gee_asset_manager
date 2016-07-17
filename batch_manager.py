@@ -45,7 +45,7 @@ def get_filename_from_path(path):
 
 def cancel_all_running_tasks_from_parser(args):
     cancel_all_running_tasks()
-
+    
 
 def delete_collection_from_parser(args):
     delete_collection(args.id)
