@@ -77,9 +77,9 @@ The program will report any illegal fields, it will also complain if not all of 
 
 Having metadata helps in organising your asstets, but is not mandatory - you can skip it.
 
-### Usage example
+## Usage example
 
-#### Delete a collection with content:
+### Delete a collection with content:
 ```
 python batch_manager.py delete test
 ```
@@ -92,7 +92,7 @@ Console output:
 2016-07-17 16:14:16,898 :: root :: INFO :: Collection users/username/test removed
 ```
 
-#### Upload a directory with images and associate properties with each image:
+### Upload a directory with images and associate properties with each image:
 ```
 python batch_manager.py upload -u my_account@gmail.com -d path_to_directory_with_tif -p path_to_metadata.csv
 ```
