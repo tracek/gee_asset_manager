@@ -7,6 +7,31 @@ class IllegalPropertyName(Exception):
     pass
 
 
+def validate_metadata_from_csv(path):
+    """
+    Check if metadata is ok
+    :param path:
+    :return: true / false
+    """
+    with open(path, mode='r') as metadata_file:
+        logging.info('Running metatdata validator for %s', path)
+        validation_result = True
+        reader = csv.reader(metadata_file)
+        header = reader.next()
+
+        if not properties_allowed(properties=header, validator=allowed_property_key):
+            validation_result = False
+
+        for row in reader:
+            if not properties_allowed(properties=row, validator=allowed_property_value):
+                validation_result = False
+
+        if validation_result == True: logging.info('Validation successful')
+        else: logging.error('Validation failed')
+
+        return validation_result
+
+
 def load_metadata_from_csv(path):
     """
     Grabs properties from the give csv file. The csv should be organised as follows:
@@ -47,7 +72,7 @@ def allowed_property_value(prop):
     if prop:
         return True
     else:
-        logging.warning('Illegal property: empty string')
+        logging.warning('Illegal property: empty string or None')
         return False
 
 
