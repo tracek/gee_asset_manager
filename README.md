@@ -1,4 +1,4 @@
-# Google Earth Engine batch asset uploader
+# Google Earth Engine Batch Asset Manager
 Google Earth Engine Batch Asset Manager ambition is helping user with batch actions on assets. It will be developed on use case basis, so if there's something missing feel free to post a feature request in [Issues](https://github.com/tracek/gee_asset_manager/issues) tab.
 
 ## Prerequisites
