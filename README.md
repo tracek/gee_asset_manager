@@ -16,6 +16,9 @@ git clone https://github.com/tracek/gee_asset_manager
 cd gee_asset_manager && pip install .
 ```
 
+## Getting started
+TO DO
+
 ## Batch uploader
 The script creates an Image Collection from GeoTIFFs in your local directory. By default, the collection name is the same as the local directory name; with optional parameter you can provide a different name. Another optional parameter is a path to a CSV file with metadata for images, which is covered in the next section: [Parsing metadata](#parsing-metadata).
 
