@@ -5,7 +5,7 @@ Google Earth Engine Batch Asset Manager ambition is helping user with batch acti
    * [Installation](#installation)
    * [Batch uploader](#batch-uploader)
      * [Parsing metadata](#parsing-metadata)
-   * [Usage example](#usage-example)
+   * [Usage examples](#usage-examples)
      * [Delete a collection with content:](#delete-a-collection-with-content)
      * [Upload a directory with images and associate properties with each image:](#upload-a-directory-with-images-and-associate-properties-with-each-image)
 
@@ -91,7 +91,7 @@ The program will report any illegal fields, it will also complain if not all of 
 
 Having metadata helps in organising your asstets, but is not mandatory - you can skip it.
 
-## Usage example
+## Usage examples
 
 ### Delete a collection with content:
 ```
