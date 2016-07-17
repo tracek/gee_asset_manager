@@ -41,6 +41,8 @@ By metadata we understand here the properties associated with each image. Thanks
 | file1                        | value1           | value2           |
 | file2                        | value3           | value4           |
 
+Note that header can contain only letters, digits and underscores. 
+
 Example:
 
 | id_no     | class      | category | binomial             |
@@ -48,7 +50,7 @@ Example:
 | my_file_1 | GASTROPODA | EN       | Aaadonta constricta  |
 | my_file_2 | GASTROPODA | CR       | Aaadonta irregularis |
 
-The corresponding files are my_file_1.tif and my_file_2.tif.
+The corresponding files are my_file_1.tif and my_file_2.tif. With each of the files four properties are associated: id_no, class, category, binomial.
 
 The program will match the file names from the upload directory with ones provided in the CSV and pass the metadata in JSON format:
 
