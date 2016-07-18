@@ -21,8 +21,8 @@ The script creates an Image Collection from GeoTIFFs in your local directory. By
 
 As usual, to print help:
 ```
-python batch_manager.py -h
-usage: GEE asset manager [-h] {delete,upload,cancel} ...
+geebam -h
+usage: geebam [-h] {delete,upload,cancel} ...
 
 Google Earth Engine Batch Asset Manager
 
@@ -39,7 +39,7 @@ optional arguments:
 To obtain help for a specific functionality, simply call it with "help" switch, e.g.:
 
 ```
-python batch_manager.py upload -h
+geebam upload -h
 
 usage: GEE asset manager [-h] -u USER -d DIRECTORY [-p PROPERTIES]
                          [-c COLLECTION]
@@ -95,7 +95,7 @@ Having metadata helps in organising your asstets, but is not mandatory - you can
 
 ### Delete a collection with content:
 ```
-python batch_manager.py delete test
+geebam delete test
 ```
 
 Console output:
@@ -108,6 +108,9 @@ Console output:
 
 ### Upload a directory with images and associate properties with each image:
 ```
-python batch_manager.py upload -u my_account@gmail.com -d path_to_directory_with_tif -p path_to_metadata.csv
+geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -p path_to_metadata.csv
 ```
-The script will prompt the user for Google account password. The program will also check that all properties in path_to_metadata.csv do not contain any illegal characters for GEE. Don't need metadata? Simply skip this option.
+The script will prompt the user for Google account password. The program
+will also check that all properties in path_to_metadata.csv do not
+contain any illegal characters for GEE. Don't need metadata? Simply skip
+this option.
