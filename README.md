@@ -16,11 +16,12 @@ git clone https://github.com/tracek/gee_asset_manager
 cd gee_asset_manager && pip install .
 ```
 
-## Getting started
-TO DO
+Installation is an optional step; the application can be also run
+directly by executing geebam.py script. The advantage of having it
+installed is being able to execute geebam as any command line tool. I
+recommend installation within virtual environment.
 
-## Batch uploader
-The script creates an Image Collection from GeoTIFFs in your local directory. By default, the collection name is the same as the local directory name; with optional parameter you can provide a different name. Another optional parameter is a path to a CSV file with metadata for images, which is covered in the next section: [Parsing metadata](#parsing-metadata).
+## Getting started
 
 As usual, to print help:
 ```
@@ -39,7 +40,20 @@ optional arguments:
   -h, --help            show this help message and exit
 ```
 
-To obtain help for a specific functionality, simply call it with "help" switch, e.g.:
+To obtain help for a specific functionality, simply call it with _help_
+switch, e.g.: `geebam upload -h`. If you didn't install geebam, then you
+can run it just by going to _geebam_ directory and running `python
+geebam.py [arguments go here]`
+
+## Batch uploader
+The script creates an Image Collection from GeoTIFFs in your local
+directory. By default, the collection name is the same as the local
+directory name; with optional parameter you can provide a different
+name. Another optional parameter is a path to a CSV file with metadata
+for images, which is covered in the next section:
+[Parsing metadata](#parsing-metadata).
+
+
 
 ```
 geebam upload -h
