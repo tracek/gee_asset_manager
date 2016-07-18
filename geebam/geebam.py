@@ -60,8 +60,7 @@ def upload_from_parser(args):
 
 def main(args=None):
     setup_logging(path=os.path.join(os.path.dirname(__file__), 'logconfig.json'))
-    ee.Initialize()
-    parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Manager', prog='GEE asset manager')
+    parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Manager')
 
     subparsers = parser.add_subparsers()
     parser_delete = subparsers.add_parser('delete', help='Deletes collection and all items inside.')
@@ -82,6 +81,7 @@ def main(args=None):
     parser_cancel.set_defaults(func=cancel_all_running_tasks_from_parser)
 
     args = parser.parse_args()
+    ee.Initialize()
     args.func(args)
 
 if __name__ == '__main__':
