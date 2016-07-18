@@ -2,12 +2,13 @@
 Google Earth Engine Batch Asset Manager ambition is helping user with batch actions on assets. It will be developed on use case basis, so if there's something missing feel free to post a feature request in [Issues](https://github.com/tracek/gee_asset_manager/issues) tab.
 
 ## Table of contents
-   * [Installation](#installation)
-   * [Batch uploader](#batch-uploader)
-     * [Parsing metadata](#parsing-metadata)
-   * [Usage examples](#usage-examples)
-     * [Delete a collection with content:](#delete-a-collection-with-content)
-     * [Upload a directory with images and associate properties with each image:](#upload-a-directory-with-images-and-associate-properties-with-each-image)
+* [Installation](#installation)
+* [Getting started](#getting-started)
+    * [Batch uploader](#batch-uploader)
+    * [Parsing metadata](#parsing-metadata)
+* [Usage examples](#usage-examples)
+    * [Delete a collection with content:](#delete-a-collection-with-content)
+    * [Upload a directory with images and associate properties with each image:](#upload-a-directory-with-images-and-associate-properties-with-each-image)
 
 ## Installation
 We assume Earth Engine Python API is installed and EE authorised as desribed [here](https://developers.google.com/earth-engine/python_install). To install:
