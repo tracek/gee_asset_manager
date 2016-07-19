@@ -36,7 +36,7 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
 
     root_path_in_gee = ee.data.getAssetRoots()[0]['id']
 
-    full_path_to_collection = os.path.join(root_path_in_gee, collection_name)
+    full_path_to_collection = root_path_in_gee + '/' + collection_name
 
     helper_functions.create_image_collection(full_path_to_collection)
 

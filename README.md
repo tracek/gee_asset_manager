@@ -73,7 +73,7 @@ Required named arguments:
                         Path to the directory with images
 
 Optional named arguments:
-  -p PROPERTIES, --properties PROPERTIES
+  -m METADATA, --metadata METADATA
                         Path to CSV with metadata
   -c COLLECTION, --collection COLLECTION
                         Name of the collection to create
