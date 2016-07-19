@@ -46,9 +46,14 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
     for current_image_no, image_path in enumerate(all_images_paths):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
         filename = helper_functions.get_filename_from_path(path=image_path)
+
+        asset_full_path = os.path.join(full_path_to_collection, filename)
+        if helper_functions.collection_exist(asset_full_path):
+            logging.warning("Asset %s already exists: not uploading", filename)
+
         properties = metadata[filename] if metadata else None
         try:
-            r = __upload_to_gcs_and_start_ingestion_task(current_image_no, filename, full_path_to_collection,
+            r = __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path,
                                                          google_session, image_path, properties)
         except Exception as e:
             logging.critical('Upload of %s has failed. Moving on...', filename)
@@ -56,11 +61,10 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
 
 
 @retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=5)
-def __upload_to_gcs_and_start_ingestion_task(current_image_no, filename, full_path_to_collection, google_session,
-                                             image_path, properties):
+def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties):
     asset_request = __upload_file(session=google_session,
                                   file_path=image_path,
-                                  asset_name=os.path.join(full_path_to_collection, filename),
+                                  asset_name=asset_full_path,
                                   properties=properties)
     task_id = ee.data.newTaskId(1)[0]
     r = ee.data.startIngestion(task_id, asset_request)
