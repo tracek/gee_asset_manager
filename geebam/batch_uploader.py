@@ -47,7 +47,7 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
         filename = helper_functions.get_filename_from_path(path=image_path)
 
-        asset_full_path = os.path.join(full_path_to_collection, filename)
+        asset_full_path = full_path_to_collection + '/' + filename
         if helper_functions.collection_exist(asset_full_path):
             logging.warning("Asset %s already exists: not uploading", filename)
 
