@@ -51,7 +51,14 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
         if helper_functions.collection_exist(asset_full_path):
             logging.warning("Asset %s already exists: not uploading", filename)
 
+        if metadata and not filename in metadata:
+            logging.warning("No metadata exists for image %s: it will not be ingested", filename)
+            with open('assets_missing_metadata.log', 'a') as missing_metadata_file:
+                missing_metadata_file.write(image_path + '\n')
+            continue
+
         properties = metadata[filename] if metadata else None
+
         try:
             r = __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path,
                                                          google_session, image_path, properties)
