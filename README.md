@@ -59,7 +59,7 @@ for images, which is covered in the next section:
 ```
 geebam upload -h
 
-usage: GEE asset manager [-h] -u USER -d DIRECTORY [-p PROPERTIES]
+usage: GEE asset manager [-h] -u USER -d DIRECTORY [-m METADATA]
                          [-c COLLECTION]
 
 Google Earth Engine Batch Asset Uploader
@@ -126,7 +126,7 @@ Console output:
 
 ### Upload a directory with images and associate properties with each image:
 ```
-geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -p path_to_metadata.csv
+geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -m path_to_metadata.csv
 ```
 The script will prompt the user for Google account password. The program
 will also check that all properties in path_to_metadata.csv do not
