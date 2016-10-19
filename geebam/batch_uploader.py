@@ -1,13 +1,14 @@
+import ast
 import getpass
 import glob
 import logging
 import os
-import sys
 import urllib
 
 import ee
 import requests
 import retrying
+from bs4 import BeautifulSoup
 
 import helper_functions
 import metadata_loader
@@ -40,7 +41,8 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
 
     helper_functions.create_image_collection(full_path_to_collection)
 
-    all_images_paths = glob.glob(os.path.join(path_for_upload, '*.tif'))
+    path = os.path.join(os.path.expanduser(path_for_upload), '*.tif')
+    all_images_paths = glob.glob(path)
     no_images = len(all_images_paths)
 
     for current_image_no, image_path in enumerate(all_images_paths):
@@ -113,32 +115,32 @@ def __get_google_auth_session(username, password):
     authentication_url = 'https://accounts.google.com/ServiceLoginAuth'
 
     session = requests.session()
-    r = session.get(google_accounts_url)
 
-    auto = r.headers.get('X-Auto-Login')
+    login_html = session.get(google_accounts_url)
+    soup_login = BeautifulSoup(login_html.content, 'html.parser').find('form').find_all('input')
+    payload = {}
+    for u in soup_login:
+        if u.has_attr('value'):
+            payload[u['name']] = u['value']
+
+    payload['Email'] = username
+    payload['Passwd'] = password
+
+    auto = login_html.headers.get('X-Auto-Login')
     follow_up = urllib.unquote(urllib.unquote(auto)).split('continue=')[-1]
-    galx = r.cookies['GALX']
+    galx = login_html.cookies['GALX']
 
-    payload = {
-        'continue': follow_up,
-        'Email': username,
-        'Passwd': password,
-        'GALX': galx
-    }
+    payload['continue'] = follow_up
+    payload['GALX'] = galx
 
-    r = session.post(authentication_url, data=payload)
-
-    if r.url != authentication_url:
-        logging.info("Logged in")
-        return session
-    else:
-        logging.critical("Logging failed")
-        sys.exit(1)
+    session.post(authentication_url, data=payload)
+    return session
 
 
 def __get_upload_url(session):
     r = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
-    return r.json()['url']
+    d = ast.literal_eval(r.text)
+    return d['url']
 
 
 def __upload_file(session, file_path, asset_name, properties=None):
