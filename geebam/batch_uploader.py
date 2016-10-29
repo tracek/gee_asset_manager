@@ -35,11 +35,8 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
     password = getpass.getpass()
     google_session = __get_google_auth_session(user, password)
 
-    root_path_in_gee = ee.data.getAssetRoots()[0]['id']
-
-    full_path_to_collection = root_path_in_gee + '/' + collection_name
-
-    helper_functions.create_image_collection(full_path_to_collection)
+    absolute_directory_path_for_upload = __get_absolute_path_for_upload(collection_name)
+    helper_functions.create_image_collection(absolute_directory_path_for_upload)
 
     path = os.path.join(os.path.expanduser(path_for_upload), '*.tif')
     all_images_paths = glob.glob(path)
@@ -49,7 +46,7 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
         filename = helper_functions.get_filename_from_path(path=image_path)
 
-        asset_full_path = full_path_to_collection + '/' + filename
+        asset_full_path = absolute_directory_path_for_upload + '/' + filename
         if helper_functions.collection_exist(asset_full_path):
             logging.warning("Asset %s already exists: not uploading", filename)
 
@@ -68,6 +65,14 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
             logging.critical('Upload of %s has failed. Moving on...', filename)
 
 
+def __get_absolute_path_for_upload(collection_name):
+    if collection_name.startswith('users') or collection_name.startswith('/users'): # absolute path
+        return collection_name
+    else: # relative path
+        root_path_in_gee = ee.data.getAssetRoots()[0]['id']
+        absolute_path = root_path_in_gee + '/' + collection_name
+        return absolute_path
+
 
 @retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=5)
 def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties):
@@ -84,7 +89,7 @@ def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, 
 def __validate_metadata(path_for_upload, metadata_path):
     validation_result = metadata_loader.validate_metadata_from_csv(metadata_path)
     keys_in_metadata = {result.keys for result in validation_result}
-    images_paths = glob.glob(os.path.join(path_for_upload, '*.tif'))
+    images_paths = glob.glob(os.path.join(path_for_upload, '*.tif*'))
     keys_in_data = {helper_functions.get_filename_from_path(path) for path in images_paths}
     missing_keys = keys_in_data - keys_in_metadata
 
