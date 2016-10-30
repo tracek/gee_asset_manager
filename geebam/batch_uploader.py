@@ -8,6 +8,7 @@ import urllib
 import ee
 import requests
 import retrying
+from requests_toolbelt.multipart import encoder
 from bs4 import BeautifulSoup
 
 import helper_functions
@@ -76,7 +77,7 @@ def __get_absolute_path_for_upload(collection_name):
 
 @retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=5)
 def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties):
-    asset_request = __upload_file(session=google_session,
+    asset_request = __upload_large_file(session=google_session,
                                   file_path=image_path,
                                   asset_name=asset_full_path,
                                   properties=properties)
@@ -146,6 +147,30 @@ def __get_upload_url(session):
     r = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
     d = ast.literal_eval(r.text)
     return d['url']
+
+
+def __upload_large_file(session, file_path, asset_name, properties=None):
+    upload_url = __get_upload_url(session)
+    with open(file_path, 'rb') as f:
+        form = encoder.MultipartEncoder({
+            "documents": (file_path, f, "application/octet-stream"),
+            "composite": "NONE",
+        })
+        headers = {"Prefer": "respond-async", "Content-Type": form.content_type}
+        resp = session.post(upload_url, headers=headers, data=form)
+        gsid = resp.json()[0]
+        asset_data = {"id": asset_name,
+                      "tilesets": [
+                          {"sources": [
+                              {"primaryPath": gsid,
+                               "additionalPaths": []
+                              }
+                          ]}
+                      ],
+                      "bands": [],
+                      "properties": properties
+                      }
+        return asset_data
 
 
 def __upload_file(session, file_path, asset_name, properties=None):
