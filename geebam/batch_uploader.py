@@ -62,7 +62,7 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
             r = __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path,
                                                          google_session, image_path, properties)
         except Exception as e:
-            logging.critical('Upload of %s has failed. Moving on...', filename)
+            logging.exception('Upload of %s has failed.', filename)
 
 
 def __get_absolute_path_for_upload(collection_name):
