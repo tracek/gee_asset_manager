@@ -4,7 +4,7 @@ import argparse
 import json
 import logging
 import logging.config
-import os
+import os, sys
 
 import ee
 
@@ -52,7 +52,8 @@ def delete_collection_from_parser(args):
 
 def upload_from_parser(args):
     batch_uploader.upload(user=args.user,
-                          path_for_upload=args.directory,
+                          source_path=args.directory,
+                          destination_path=args.path,
                           metadata_path=args.metadata,
                           collection_name=args.collection or get_filename_from_path(args.directory))
 
@@ -72,14 +73,22 @@ def main(args=None):
     required_named.add_argument('-d', '--directory', help='Path to the directory with images.', required=True)
     optional_named = parser_upload.add_argument_group('Optional named arguments')
     optional_named.add_argument('-m', '--metadata', help='Path to CSV with metadata.')
-    optional_named.add_argument('-c', '--collection', help='Name of the collection to create. If not provided, '
-                                                           'directory name will be used.')
+    optional_named.add_argument('-c', '--collection', help='Name with path of the collection to create. If not provided, directory name '
+                                                           'will be used. It assumes the upload goes to the user folder. Need upload to '
+                                                           'a shared directory? Use --path instead. They are mutuall exclusive')
+    optional_named.add_argument('-p', '--path', help='Absolute upload path. It does not take any assumptions about user folder, so '
+                                                     'it can be used to upload to a shared folder. Mutually exclusive with --collection.')
     parser_upload.set_defaults(func=upload_from_parser)
 
     parser_cancel = subparsers.add_parser('cancel', help='Cancel all running tasks')
     parser_cancel.set_defaults(func=cancel_all_running_tasks_from_parser)
 
     args = parser.parse_args()
+
+    if args.collection and args.path:
+        logging.error('Collection and Path options are mutually exclusive')
+        sys.exit(1)
+
     ee.Initialize()
     args.func(args)
 

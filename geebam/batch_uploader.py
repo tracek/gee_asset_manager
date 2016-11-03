@@ -15,7 +15,7 @@ import helper_functions
 import metadata_loader
 
 
-def upload(user, path_for_upload, metadata_path=None, collection_name=None):
+def upload(user, source_path, destination_path=None, metadata_path=None, collection_name=None):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -25,7 +25,8 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
     which the error will be propagated further.
 
     :param user: name of a Google account
-    :param path_for_upload: path to a directory
+    :param source_path: path to a directory
+    :param destination_path: where to upload (absolute path)
     :param metadata_path: (optional) path to file with metadata
     :param collection_name: (optional) name to be given for the uploaded collection
     :return:
@@ -36,10 +37,10 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
     password = getpass.getpass()
     google_session = __get_google_auth_session(user, password)
 
-    absolute_directory_path_for_upload = __get_absolute_path_for_upload(collection_name)
+    absolute_directory_path_for_upload = __get_absolute_path_for_upload(collection_name, destination_path)
     helper_functions.create_image_collection(absolute_directory_path_for_upload)
 
-    path = os.path.join(os.path.expanduser(path_for_upload), '*.tif')
+    path = os.path.join(os.path.expanduser(source_path), '*.tif')
     all_images_paths = glob.glob(path)
     no_images = len(all_images_paths)
 
@@ -66,7 +67,9 @@ def upload(user, path_for_upload, metadata_path=None, collection_name=None):
             logging.exception('Upload of %s has failed.', filename)
 
 
-def __get_absolute_path_for_upload(collection_name):
+def __get_absolute_path_for_upload(collection_name, destination_path):
+    if destination_path: # user has provided an absolute path
+        return destination_path
     if collection_name.startswith('users') or collection_name.startswith('/users'): # absolute path
         return collection_name
     else: # relative path
