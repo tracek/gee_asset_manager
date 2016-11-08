@@ -2,6 +2,7 @@ import csv
 import logging
 import re
 import collections
+import ast
 
 
 ValidationResult = collections.namedtuple('ValidationResult', ['success', 'keys'])
@@ -65,8 +66,18 @@ def load_metadata_from_csv(path):
         if not properties_allowed(properties=header, validator=allowed_property_key):
             raise IllegalPropertyName()
 
-        metadata = {row[0]: dict(zip(header, row)) for row in reader
-                    if properties_allowed(properties=row, validator=allowed_property_value)}
+        metadata = {}
+
+        for row in reader:
+            if properties_allowed(properties=row, validator=allowed_property_value):
+                values = []
+                for item in row:
+                    try:
+                        values.append(ast.literal_eval(item))
+                    except (ValueError, SyntaxError) as e:
+                        values.append(item)
+                metadata[row[0]] = dict(zip(header, values))
+
         return metadata
 
 

@@ -15,7 +15,7 @@ import helper_functions
 import metadata_loader
 
 
-def upload(user, source_path, destination_path=None, metadata_path=None, collection_name=None):
+def upload(user, source_path, destination_path=None, metadata_path=None, collection_name=None, multipart_upload=False):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -61,8 +61,8 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
         properties = metadata[filename] if metadata else None
 
         try:
-            r = __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path,
-                                                         google_session, image_path, properties)
+            r = __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path,
+                                                         properties, multipart_upload)
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
 
@@ -79,11 +79,17 @@ def __get_absolute_path_for_upload(collection_name, destination_path):
 
 
 @retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=5)
-def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties):
-    asset_request = __upload_large_file(session=google_session,
-                                  file_path=image_path,
-                                  asset_name=asset_full_path,
-                                  properties=properties)
+def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties, multipart_upload):
+    if multipart_upload:
+        asset_request = __upload_large_file(session=google_session,
+                                      file_path=image_path,
+                                      asset_name=asset_full_path,
+                                      properties=properties)
+    else:
+        asset_request = __upload_file(session=google_session,
+                                      file_path=image_path,
+                                      asset_name=asset_full_path,
+                                      properties=properties)
     task_id = ee.data.newTaskId(1)[0]
     r = ee.data.startIngestion(task_id, asset_request)
     __periodic_wait(current_image=current_image_no, period=50)
@@ -177,22 +183,23 @@ def __upload_large_file(session, file_path, asset_name, properties=None):
 
 
 def __upload_file(session, file_path, asset_name, properties=None):
-    files = {'file': open(file_path, 'rb')}
-    upload_url = __get_upload_url(session)
-    upload = session.post(upload_url, files=files)
-    gsid = upload.json()[0]
-    asset_data = {"id": asset_name,
-                  "tilesets": [
-                      {"sources": [
-                          {"primaryPath": gsid,
-                           "additionalPaths": []
-                          }
-                      ]}
-                  ],
-                  "bands": [],
-                  "properties": properties
-                  }
-    return asset_data
+    with open(file_path, 'rb') as f:
+        files = {'file': f}
+        upload_url = __get_upload_url(session)
+        upload = session.post(upload_url, files=files)
+        gsid = upload.json()[0]
+        asset_data = {"id": asset_name,
+                      "tilesets": [
+                          {"sources": [
+                              {"primaryPath": gsid,
+                               "additionalPaths": []
+                              }
+                          ]}
+                      ],
+                      "bands": [],
+                      "properties": properties
+                      }
+        return asset_data
 
 
 def __periodic_wait(current_image, period):
