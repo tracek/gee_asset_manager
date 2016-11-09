@@ -3,6 +3,7 @@ import getpass
 import glob
 import logging
 import os
+import sys
 import urllib
 
 import ee
@@ -44,13 +45,13 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
     all_images_paths = glob.glob(path)
     no_images = len(all_images_paths)
 
-    for current_image_no, image_path in enumerate(all_images_paths):
+    images_for_upload_path = __find_remaining_assets_for_upload(all_images_paths, absolute_directory_path_for_upload)
+
+    for current_image_no, image_path in enumerate(images_for_upload_path):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
         filename = helper_functions.get_filename_from_path(path=image_path)
 
         asset_full_path = absolute_directory_path_for_upload + '/' + filename
-        if helper_functions.collection_exist(asset_full_path):
-            logging.warning("Asset %s already exists: not uploading", filename)
 
         if metadata and not filename in metadata:
             logging.warning("No metadata exists for image %s: it will not be ingested", filename)
@@ -65,6 +66,25 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
                                                          properties, multipart_upload)
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
+
+
+def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
+    local_assets = [helper_functions.get_filename_from_path(path) for path in path_to_local_assets]
+    if helper_functions.collection_exist(path_remote):
+        remote_assets = helper_functions.get_asset_names_from_collection(path_remote)
+        if len(remote_assets) > 0:
+            assets_left_for_upload = set(local_assets) - set(remote_assets)
+            if len(assets_left_for_upload) == 0:
+                logging.warning('Collection already exists and contains all assets provided for upload. Exiting ...')
+                sys.exit(1)
+
+            logging.info('Collection already exists. %d assets left for upload to %s.', len(assets_left_for_upload), path_remote)
+            assets_left_for_upload_full_path = [path for path in path_to_local_assets if helper_functions.get_filename_from_path(path) in assets_left_for_upload]
+            return assets_left_for_upload_full_path
+        else:
+            logging.info('Collection already exists, but it is empty.')
+
+    return path_to_local_assets
 
 
 def __get_absolute_path_for_upload(collection_name, destination_path):

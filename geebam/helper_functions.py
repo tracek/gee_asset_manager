@@ -2,7 +2,6 @@ import os
 import logging
 import ee
 import time
-import sys
 
 
 def get_filename_from_path(path):
@@ -32,3 +31,8 @@ def create_image_collection(full_path_to_collection):
     else:
         ee.data.createAsset({'type': ee.data.ASSET_TYPE_IMAGE_COLL}, full_path_to_collection)
         logging.info('New collection %s created', full_path_to_collection)
+
+def get_asset_names_from_collection(collection_path):
+    assets_list = ee.data.getList(params={'id': collection_path})
+    assets_names = [os.path.basename(asset['id']) for asset in assets_list]
+    return assets_names
