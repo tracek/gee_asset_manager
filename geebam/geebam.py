@@ -51,6 +51,9 @@ def delete_collection_from_parser(args):
 
 
 def upload_from_parser(args):
+    if args.collection and args.path:
+        logging.error('Collection and Path options are mutually exclusive')
+        sys.exit(1)
     batch_uploader.upload(user=args.user,
                           source_path=args.directory,
                           destination_path=args.path,
@@ -88,9 +91,6 @@ def main(args=None):
 
     args = parser.parse_args()
 
-    if args.collection and args.path:
-        logging.error('Collection and Path options are mutually exclusive')
-        sys.exit(1)
 
     ee.Initialize()
     args.func(args)
