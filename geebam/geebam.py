@@ -59,7 +59,8 @@ def upload_from_parser(args):
                           destination_path=args.path,
                           metadata_path=args.metadata,
                           collection_name=args.collection or get_filename_from_path(args.directory),
-                          multipart_upload=args.large)
+                          multipart_upload=args.large,
+                          nodata_value=args.nodata)
 
 
 def main(args=None):
@@ -82,8 +83,9 @@ def main(args=None):
                                                            'a shared directory? Use --path instead. They are mutuall exclusive')
     optional_named.add_argument('-p', '--path', help='Absolute upload path. It does not take any assumptions about user folder, so '
                                                      'it can be used to upload to a shared folder. Mutually exclusive with --collection.')
-    optional_named.add_argument('-l', '--large', action='store_true', help='(Advanced) Use multipart upload. Might help if upload of large '
-                                                                           'files is failing on some systems. Might cause other issues.')
+    optional_named.add_argument('--large', action='store_true', help='(Advanced) Use multipart upload. Might help if upload of large '
+                                                                     'files is failing on some systems. Might cause other issues.')
+    optional_named.add_argument('--nodata', type=int, help='The value to burn into the raster as NoData (missing data)')
     parser_upload.set_defaults(func=upload_from_parser)
 
     parser_cancel = subparsers.add_parser('cancel', help='Cancel all running tasks')

@@ -16,7 +16,8 @@ import helper_functions
 import metadata_loader
 
 
-def upload(user, source_path, destination_path=None, metadata_path=None, collection_name=None, multipart_upload=False):
+def upload(user, source_path, destination_path=None, metadata_path=None, collection_name=None, multipart_upload=False,
+           nodata_value=None):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -63,7 +64,7 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
 
         try:
             r = __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path,
-                                                         properties, multipart_upload)
+                                                         properties, multipart_upload, nodata_value)
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
 
@@ -79,7 +80,8 @@ def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
                 sys.exit(1)
 
             logging.info('Collection already exists. %d assets left for upload to %s.', len(assets_left_for_upload), path_remote)
-            assets_left_for_upload_full_path = [path for path in path_to_local_assets if helper_functions.get_filename_from_path(path) in assets_left_for_upload]
+            assets_left_for_upload_full_path = [path for path in path_to_local_assets
+                                                if helper_functions.get_filename_from_path(path) in assets_left_for_upload]
             return assets_left_for_upload_full_path
         else:
             logging.info('Collection already exists, but it is empty.')
@@ -99,17 +101,20 @@ def __get_absolute_path_for_upload(collection_name, destination_path):
 
 
 @retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=5)
-def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties, multipart_upload):
+def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties,
+                                             multipart_upload, nodata_value):
     if multipart_upload:
         asset_request = __upload_large_file(session=google_session,
                                       file_path=image_path,
                                       asset_name=asset_full_path,
-                                      properties=properties)
+                                      properties=properties,
+                                      nodata=nodata_value)
     else:
         asset_request = __upload_file(session=google_session,
                                       file_path=image_path,
                                       asset_name=asset_full_path,
-                                      properties=properties)
+                                      properties=properties,
+                                      nodata=nodata_value)
     task_id = ee.data.newTaskId(1)[0]
     r = ee.data.startIngestion(task_id, asset_request)
     __periodic_wait(current_image=current_image_no, period=50)
@@ -178,7 +183,7 @@ def __get_upload_url(session):
     return d['url']
 
 
-def __upload_large_file(session, file_path, asset_name, properties=None):
+def __upload_large_file(session, file_path, asset_name, properties=None, nodata=None):
     upload_url = __get_upload_url(session)
     with open(file_path, 'rb') as f:
         form = encoder.MultipartEncoder({
@@ -197,12 +202,13 @@ def __upload_large_file(session, file_path, asset_name, properties=None):
                           ]}
                       ],
                       "bands": [],
-                      "properties": properties
+                      "properties": properties,
+                      "missingData": {"value": nodata}
                       }
         return asset_data
 
 
-def __upload_file(session, file_path, asset_name, properties=None):
+def __upload_file(session, file_path, asset_name, properties=None, nodata=None):
     with open(file_path, 'rb') as f:
         files = {'file': f}
         upload_url = __get_upload_url(session)
@@ -217,7 +223,8 @@ def __upload_file(session, file_path, asset_name, properties=None):
                           ]}
                       ],
                       "bands": [],
-                      "properties": properties
+                      "properties": properties,
+                      "missingData": {"value": nodata}
                       }
         return asset_data
 
