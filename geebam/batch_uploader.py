@@ -83,8 +83,6 @@ def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
             assets_left_for_upload_full_path = [path for path in path_to_local_assets
                                                 if helper_functions.get_filename_from_path(path) in assets_left_for_upload]
             return assets_left_for_upload_full_path
-        else:
-            logging.info('Collection already exists, but it is empty.')
 
     return path_to_local_assets
 
