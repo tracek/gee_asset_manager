@@ -74,9 +74,21 @@ Required named arguments:
 
 Optional named arguments:
   -m METADATA, --metadata METADATA
-                        Path to CSV with metadata
+                        Path to CSV with metadata.
   -c COLLECTION, --collection COLLECTION
-                        Name of the collection to create
+                        Name with path of the collection to create. If not
+                        provided, directory name will be used. It assumes the
+                        upload goes to the user folder. Need upload to a
+                        shared directory? Use --path instead. They are mutuall
+                        exclusive
+  -p PATH, --path PATH  Absolute upload path. It does not take any assumptions
+                        about user folder, so it can be used to upload to a
+                        shared folder. Mutually exclusive with --collection.
+  --large               (Advanced) Use multipart upload. Might help if upload
+                        of large files is failing on some systems. Might cause
+                        other issues.
+  --nodata NODATA       The value to burn into the raster as NoData (missing
+                        data)
 
 ```
 
