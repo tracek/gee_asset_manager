@@ -4,10 +4,12 @@ import argparse
 import json
 import logging
 import logging.config
-import os, sys
+import os
+import sys
 
 import ee
 
+import batch_remover
 import batch_uploader
 
 
@@ -15,19 +17,6 @@ def setup_logging(path):
     with open(path, 'rt') as f:
         config = json.load(f)
     logging.config.dictConfig(config)
-
-
-def delete_collection(id):
-    logging.info('Attempting to delete collection %s', id)
-    if 'users' not in id:
-        root_path_in_gee = ee.data.getAssetRoots()[0]['id']
-        id = root_path_in_gee + '/' + id
-    params = {'id': id}
-    items_in_collection = ee.data.getList(params)
-    for item in items_in_collection:
-        ee.data.deleteAsset(item['id'])
-    ee.data.deleteAsset(id)
-    logging.info('Collection %s removed', id)
 
 
 def cancel_all_running_tasks():
@@ -47,7 +36,7 @@ def cancel_all_running_tasks_from_parser(args):
     
 
 def delete_collection_from_parser(args):
-    delete_collection(args.id)
+    batch_remover.delete(args.id)
 
 
 def upload_from_parser(args):
