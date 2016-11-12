@@ -104,17 +104,15 @@ Note that header can contain only letters, digits and underscores.
 
 Example:
 
-| id_no     | class      | category | binomial             |
-|-----------|------------|----------|----------------------|
-| my_file_1 | GASTROPODA | EN       | Aaadonta constricta  |
-| my_file_2 | GASTROPODA | CR       | Aaadonta irregularis |
+| id_no     | class      | category | binomial             |system:time_start|
+|-----------|------------|----------|----------------------|-----------------|
+| my_file_1 | GASTROPODA | EN       | Aaadonta constricta  |1478943081000    |
+| my_file_2 | GASTROPODA | CR       | Aaadonta irregularis |1478943081000    |
 
-The corresponding files are my_file_1.tif and my_file_2.tif. With each of the files four properties are associated: id_no, class, category, binomial.
-
-The program will match the file names from the upload directory with ones provided in the CSV and pass the metadata in JSON format:
+The corresponding files are my_file_1.tif and my_file_2.tif. With each of the files five properties are associated: id_no, class, category, binomial and system:time_start. The latter is time in Unix epoch format, in milliseconds, as documented in GEE glosary. The program will match the file names from the upload directory with ones provided in the CSV and pass the metadata in JSON format:
 
 ```
-{ id_no: my_file_1, class: GASTROPODA, category: EN, binomial: Aaadonta constricta}
+{ id_no: my_file_1, class: GASTROPODA, category: EN, binomial: Aaadonta constricta, system:time_start: 1478943081000}
 ```
 
 The program will report any illegal fields, it will also complain if not all of the images passed for upload have metadata associated. User can opt to ignore it, in which case some assets will have no properties.
@@ -124,6 +122,8 @@ Having metadata helps in organising your asstets, but is not mandatory - you can
 ## Usage examples
 
 ### Delete a collection with content:
+
+The delete is recursive, meaning it will delete also all children assets: images, collections and folders. Use with caution!
 ```
 geebam delete test
 ```
@@ -136,11 +136,14 @@ Console output:
 2016-07-17 16:14:16,898 :: root :: INFO :: Collection users/username/test removed
 ```
 
-### Upload a directory with images and associate properties with each image:
+### Upload a directory with images to your myfolder/mycollection and associate properties with each image:
 ```
-geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -m path_to_metadata.csv
+geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -m path_to_metadata.csv -c myfolder/mycollection
 ```
-The script will prompt the user for Google account password. The program
-will also check that all properties in path_to_metadata.csv do not
-contain any illegal characters for GEE. Don't need metadata? Simply skip
-this option.
+The script will prompt the user for Google account password. The program will also check that all properties in path_to_metadata.csv do not contain any illegal characters for GEE. Don't need metadata? Simply skip this option. With --collection option it is assumed that the upload goes to you own directory, so there is no need to use fully qualified name like users/username/myfolder/mycollection - myfolder/mycollection is enough.
+
+### Upload a directory with images with specific NoData value to a selected destination 
+```
+geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -p projects/shared/folder --nodata 222
+```
+In this case we need to supply full path to the destination, which is helpful when we upload to a shared folder. In the provided example we also burn value 222 into all rasters for missing data (NoData).
