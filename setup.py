@@ -18,7 +18,9 @@ setup(
     install_requires=[
         'retrying',
         'requests',
-        'earthengine-api'
+        'earthengine-api',
+        'requests_toolbelt',
+        'bs4'
     ],
     entry_points={
         'console_scripts': [
