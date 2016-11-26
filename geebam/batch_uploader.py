@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 import urllib
+import csv
 
 import ee
 import requests
@@ -14,7 +15,6 @@ from bs4 import BeautifulSoup
 
 import helper_functions
 import metadata_loader
-
 
 def upload(user, source_path, destination_path=None, metadata_path=None, collection_name=None, multipart_upload=False,
            nodata_value=None):
@@ -33,6 +33,10 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
     :param collection_name: (optional) name to be given for the uploaded collection
     :return:
     """
+    submitted_tasks_id = {}
+    failed_upload_file = open('failed_upload.csv', 'wb')
+    failed_upload_writer = csv.writer(failed_upload_file)
+    failed_upload_writer.writerow(['filename', 'task_id', 'error_msg'])
 
     metadata = metadata_loader.load_metadata_from_csv(metadata_path) if metadata_path else None
 
@@ -44,9 +48,12 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
 
     path = os.path.join(os.path.expanduser(source_path), '*.tif')
     all_images_paths = glob.glob(path)
-    no_images = len(all_images_paths)
-
     images_for_upload_path = __find_remaining_assets_for_upload(all_images_paths, absolute_directory_path_for_upload)
+    no_images = len(images_for_upload_path)
+
+    if no_images == 0:
+        logging.error('No images found that match %s. Exiting...', path)
+        sys.exit(1)
 
     for current_image_no, image_path in enumerate(images_for_upload_path):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
@@ -56,17 +63,22 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
 
         if metadata and not filename in metadata:
             logging.warning("No metadata exists for image %s: it will not be ingested", filename)
-            with open('assets_missing_metadata.log', 'a') as missing_metadata_file:
-                missing_metadata_file.write(image_path + '\n')
+            failed_upload_writer.writerow([filename, 0, 'Missing metadata'])
             continue
 
         properties = metadata[filename] if metadata else None
 
         try:
-            r = __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path,
-                                                         properties, multipart_upload, nodata_value)
+            task_id = __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, image_path,
+                                                               properties, multipart_upload, nodata_value)
+            submitted_tasks_id[task_id] = filename
+            __periodic_check(current_image=current_image_no, period=4, tasks=submitted_tasks_id, writer=failed_upload_writer)
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
+            failed_upload_writer.writerow([filename, 0, str(e)])
+
+    __check_for_failed_tasks_and_report(tasks=submitted_tasks_id, writer=failed_upload_writer)
+    failed_upload_file.close()
 
 
 def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
@@ -98,8 +110,8 @@ def __get_absolute_path_for_upload(collection_name, destination_path):
         return absolute_path
 
 
-@retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=5)
-def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, google_session, image_path, properties,
+@retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
+def __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, image_path, properties,
                                              multipart_upload, nodata_value):
     if multipart_upload:
         asset_request = __upload_large_file(session=google_session,
@@ -115,8 +127,7 @@ def __upload_to_gcs_and_start_ingestion_task(current_image_no, asset_full_path, 
                                       nodata=nodata_value)
     task_id = ee.data.newTaskId(1)[0]
     r = ee.data.startIngestion(task_id, asset_request)
-    __periodic_wait(current_image=current_image_no, period=50)
-    return r
+    return task_id
 
 
 def __validate_metadata(path_for_upload, metadata_path):
@@ -227,8 +238,26 @@ def __upload_file(session, file_path, asset_name, properties=None, nodata=None):
         return asset_data
 
 
-def __periodic_wait(current_image, period):
+def __periodic_check(current_image, period, tasks, writer):
     if (current_image + 1) % period == 0:
+        logging.info('Periodic check')
+        __check_for_failed_tasks_and_report(tasks=tasks, writer=writer)
         # Time to check how many tasks are running!
-        logging.info('Periodic check for number of running tasks is due')
-        helper_functions.wait_for_tasks_to_complete()
+        helper_functions.wait_for_tasks_to_complete(waiting_time=10, no_allowed_tasks_running=20)
+
+
+def __check_for_failed_tasks_and_report(tasks, writer):
+    if len(tasks) == 0:
+        return
+
+    statuses = ee.data.getTaskStatus(tasks.keys())
+
+    for status in statuses:
+        if status['state'] == 'FAILED':
+            task_id = status['id']
+            filename = tasks[task_id]
+            error_message = status['error_message']
+            writer.writerow(filename, task_id, error_message)
+            logging.error('Ingestion of image %s has failed with message %s', filename, error_message)
+
+    tasks.clear()
