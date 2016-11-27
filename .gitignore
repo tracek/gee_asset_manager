@@ -89,5 +89,5 @@ ENV/
 .ropeproject
 
 # log files
-
+*.csv
 .idea/

@@ -32,6 +32,8 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
     :param destination_path: where to upload (absolute path)
     :param metadata_path: (optional) path to file with metadata
     :param collection_name: (optional) name to be given for the uploaded collection
+    :param multipart_upload: (optional) alternative mode op upload - use if the other one fails
+    :param nodata_value: (optinal) value to burn into raster for missind data in the image
     :return:
     """
     submitted_tasks_id = {}
@@ -72,7 +74,7 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
             task_id = __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, image_path,
                                                                properties, multipart_upload, nodata_value)
             submitted_tasks_id[task_id] = filename
-            __periodic_check(current_image=current_image_no, period=20, tasks=submitted_tasks_id, writer=failed_upload_writer)
+            __periodic_check(current_image=current_image_no, period=20, tasks=submitted_tasks_id, writer=failed_asset_writer)
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
             failed_asset_writer.writerow([filename, 0, str(e)])
@@ -100,11 +102,11 @@ def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
 
 
 def __get_absolute_path_for_upload(collection_name, destination_path):
-    if destination_path: # user has provided an absolute path
+    if destination_path:  # user has provided an absolute path
         return destination_path
-    if collection_name.startswith('users') or collection_name.startswith('/users'): # absolute path
+    if collection_name.startswith('users') or collection_name.startswith('/users'):  # absolute path
         return collection_name
-    else: # relative path
+    else:  # relative path
         root_path_in_gee = ee.data.getAssetRoots()[0]['id']
         absolute_path = root_path_in_gee + '/' + collection_name
         return absolute_path
@@ -115,10 +117,10 @@ def __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, im
                                              multipart_upload, nodata_value):
     if multipart_upload:
         asset_request = __upload_large_file(session=google_session,
-                                      file_path=image_path,
-                                      asset_name=asset_full_path,
-                                      properties=properties,
-                                      nodata=nodata_value)
+                                            file_path=image_path,
+                                            asset_name=asset_full_path,
+                                            properties=properties,
+                                            nodata=nodata_value)
     else:
         asset_request = __upload_file(session=google_session,
                                       file_path=image_path,
@@ -126,7 +128,7 @@ def __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, im
                                       properties=properties,
                                       nodata=nodata_value)
     task_id = ee.data.newTaskId(1)[0]
-    r = ee.data.startIngestion(task_id, asset_request)
+    _ = ee.data.startIngestion(task_id, asset_request)
     return task_id
 
 
@@ -304,7 +306,7 @@ class FailedAssetsWriter(object):
 
     def writerow(self, row):
         if not self.initialized:
-            if (sys.version_info > (3, 0)):
+            if sys.version_info > (3, 0):
                 self.failed_upload_file = open('failed_upload.csv', 'w')
             else:
                 self.failed_upload_file = open('failed_upload.csv', 'wb')
@@ -316,3 +318,4 @@ class FailedAssetsWriter(object):
     def close(self):
         if self.initialized:
             self.failed_upload_file.close()
+            self.initialized = False
