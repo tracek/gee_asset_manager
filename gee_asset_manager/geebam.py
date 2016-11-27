@@ -9,8 +9,8 @@ import sys
 
 import ee
 
-import batch_remover
-import batch_uploader
+from gee_asset_manager.batch_remover import delete
+from gee_asset_manager.batch_uploader import upload
 
 
 def setup_logging(path):
@@ -36,20 +36,20 @@ def cancel_all_running_tasks_from_parser(args):
     
 
 def delete_collection_from_parser(args):
-    batch_remover.delete(args.id)
+    delete(args.id)
 
 
 def upload_from_parser(args):
     if args.collection and args.path:
         logging.error('Collection and Path options are mutually exclusive')
         sys.exit(1)
-    batch_uploader.upload(user=args.user,
-                          source_path=args.directory,
-                          destination_path=args.path,
-                          metadata_path=args.metadata,
-                          collection_name=args.collection or get_filename_from_path(args.directory),
-                          multipart_upload=args.large,
-                          nodata_value=args.nodata)
+    upload(user=args.user,
+           source_path=args.directory,
+           destination_path=args.path,
+           metadata_path=args.metadata,
+           collection_name=args.collection or get_filename_from_path(args.directory),
+           multipart_upload=args.large,
+           nodata_value=args.nodata)
 
 
 def main(args=None):

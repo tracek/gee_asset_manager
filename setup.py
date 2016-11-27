@@ -6,9 +6,7 @@ except ImportError:
 setup(
     name='geebam',
     version='0.1.0',
-    packages=['geebam'],
-    package_dir={'geebam':
-                 'geebam'},
+    packages=['gee_asset_manager'],
     package_data={'': ['logconfig.json']},
     url='https://github.com/tracek/gee_asset_manager',
     license='Apache 2.0',
@@ -24,7 +22,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'geebam=geebam.geebam:main',
+            'geebam=gee_asset_manager.geebam:main',
         ],
     },
 )
