@@ -72,7 +72,7 @@ def upload(user, source_path, destination_path=None, metadata_path=None, collect
             task_id = __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, image_path,
                                                                properties, multipart_upload, nodata_value)
             submitted_tasks_id[task_id] = filename
-            __periodic_check(current_image=current_image_no, period=4, tasks=submitted_tasks_id, writer=failed_upload_writer)
+            __periodic_check(current_image=current_image_no, period=20, tasks=submitted_tasks_id, writer=failed_upload_writer)
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
             failed_upload_writer.writerow([filename, 0, str(e)])
