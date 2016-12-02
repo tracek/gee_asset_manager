@@ -14,7 +14,7 @@ import retrying
 from requests_toolbelt.multipart import encoder
 from bs4 import BeautifulSoup
 
-from gee_asset_manager.metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
+from .metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
 
 
 def upload(user, source_path, destination_path=None, metadata_path=None, collection_name=None, multipart_upload=False,

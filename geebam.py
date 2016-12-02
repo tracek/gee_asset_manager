@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
-import json
 import logging
-import logging.config
 import os
 import sys
 
@@ -11,12 +9,7 @@ import ee
 
 from gee_asset_manager.batch_remover import delete
 from gee_asset_manager.batch_uploader import upload
-
-
-def setup_logging(path):
-    with open(path, 'rt') as f:
-        config = json.load(f)
-    logging.config.dictConfig(config)
+from gee_asset_manager.config import setup_logging
 
 
 def cancel_all_running_tasks():
@@ -53,7 +46,7 @@ def upload_from_parser(args):
 
 
 def main(args=None):
-    setup_logging(path=os.path.join(os.path.dirname(__file__), 'logconfig.json'))
+    setup_logging()
     parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Manager')
 
     subparsers = parser.add_subparsers()

@@ -7,7 +7,8 @@ setup(
     name='geebam',
     version='0.1.0',
     packages=['gee_asset_manager'],
-    package_data={'': ['logconfig.json']},
+    # package_dir=['gee_asset_manager'],
+    package_data={'gee_asset_manager': ['logconfig.json']},
     url='https://github.com/tracek/gee_asset_manager',
     license='Apache 2.0',
     author='Lukasz Tracewski',
@@ -22,7 +23,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'geebam=gee_asset_manager.geebam:main',
+            'geebam=geebam:main',
         ],
     },
+    scripts=['geebam.py']
 )
