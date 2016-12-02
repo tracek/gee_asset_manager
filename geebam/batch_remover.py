@@ -4,15 +4,19 @@ import sys
 import ee
 
 
-def delete(asset_path):
-    full_path = __get_full_path(asset_path)
-    __delete_recursive(full_path)
-    logging.info('Collection %s removed', full_path)
+def delete(asset_path, abspath=False):
+    if not abspath:
+        asset_path = __get_full_path(asset_path)
+    __delete_recursive(asset_path)
+    logging.info('Collection %s removed', asset_path)
 
 
 def __delete_recursive(asset_path):
     info = ee.data.getInfo(asset_path)
-    if info['type'] == 'Image':
+    if not info:
+        logging.warning('Nothing to delete.')
+        sys.exit(1)
+    elif info['type'] == 'Image':
         pass
     elif info['type'] == 'Folder':
         items_in_destination = ee.data.getList({'id': asset_path})

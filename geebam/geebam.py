@@ -36,7 +36,7 @@ def cancel_all_running_tasks_from_parser(args):
     
 
 def delete_collection_from_parser(args):
-    batch_remover.delete(args.id)
+    batch_remover.delete(args.id, args.abspath)
 
 
 def upload_from_parser(args):
@@ -59,6 +59,7 @@ def main(args=None):
     subparsers = parser.add_subparsers()
     parser_delete = subparsers.add_parser('delete', help='Deletes collection and all items inside.')
     parser_delete.add_argument('id', help='ID of the collection, either fully qualified or abbreviated (no need to pass users/username).')
+    parser_delete.add_argument('-p', '--abspath', action='store_true', help='Absolute path. It does not take any assumptions about user folder.')
     parser_delete.set_defaults(func=delete_collection_from_parser)
 
     parser_upload = subparsers.add_parser('upload', help='Batch Asset Uploader.')
