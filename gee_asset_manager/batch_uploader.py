@@ -4,9 +4,13 @@ import glob
 import logging
 import os
 import sys
-import urllib
 import csv
 import time
+
+if sys.version_info > (3, 0):
+    from urllib.parse import unquote
+else:
+    from urllib import unquote
 
 import ee
 import requests
@@ -178,7 +182,7 @@ def __get_google_auth_session(username, password):
     payload['Passwd'] = password
 
     auto = login_html.headers.get('X-Auto-Login')
-    follow_up = urllib.unquote(urllib.unquote(auto)).split('continue=')[-1]
+    follow_up = unquote(unquote(auto)).split('continue=')[-1]
     galx = login_html.cookies['GALX']
 
     payload['continue'] = follow_up

@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='geebam',
-    version='0.1.0',
+    version='0.1.1',
     packages=['gee_asset_manager'],
     # package_dir=['gee_asset_manager'],
     package_data={'gee_asset_manager': ['logconfig.json']},
