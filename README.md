@@ -67,23 +67,15 @@ Google Earth Engine Batch Asset Uploader
 optional arguments:
   -h, --help            show this help message and exit
 
-Required named arguments:
-  -u USER, --user USER  Google account name (gmail address)
-  -d DIRECTORY, --directory DIRECTORY
-                        Path to the directory with images
+Required named arguments.:
+  -u USER, --user USER  Google account name (gmail address).
+  --source SOURCE       Path to the directory with images for upload.
+  --dest DEST           Destination. Full path for upload to Google Earth
+                        Engine, e.g. users/pinkiepie/myponycollection
 
 Optional named arguments:
   -m METADATA, --metadata METADATA
                         Path to CSV with metadata.
-  -c COLLECTION, --collection COLLECTION
-                        Name with path of the collection to create. If not
-                        provided, directory name will be used. It assumes the
-                        upload goes to the user folder. Need upload to a
-                        shared directory? Use --path instead. They are mutuall
-                        exclusive
-  -p PATH, --path PATH  Absolute upload path. It does not take any assumptions
-                        about user folder, so it can be used to upload to a
-                        shared folder. Mutually exclusive with --collection.
   --large               (Advanced) Use multipart upload. Might help if upload
                         of large files is failing on some systems. Might cause
                         other issues.
@@ -125,7 +117,7 @@ Having metadata helps in organising your asstets, but is not mandatory - you can
 
 The delete is recursive, meaning it will delete also all children assets: images, collections and folders. Use with caution!
 ```
-geebam delete test
+geebam delete users/pinkiepie/test
 ```
 
 Console output:
@@ -133,17 +125,17 @@ Console output:
 2016-07-17 16:14:09,212 :: oauth2client.client :: INFO :: Attempting refresh to obtain initial access_token
 2016-07-17 16:14:09,213 :: oauth2client.client :: INFO :: Refreshing access_token
 2016-07-17 16:14:10,842 :: root :: INFO :: Attempting to delete collection test
-2016-07-17 16:14:16,898 :: root :: INFO :: Collection users/username/test removed
+2016-07-17 16:14:16,898 :: root :: INFO :: Collection users/pinkiepie/test removed
 ```
 
 ### Upload a directory with images to your myfolder/mycollection and associate properties with each image:
 ```
-geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -m path_to_metadata.csv -c myfolder/mycollection
+geebam upload -u pinkiepie@gmail.com --source path_to_directory_with_tif -m path_to_metadata.csv --dest users/pinkiepie/myfolder/myponycollection
 ```
-The script will prompt the user for Google account password. The program will also check that all properties in path_to_metadata.csv do not contain any illegal characters for GEE. Don't need metadata? Simply skip this option. With --collection option it is assumed that the upload goes to you own directory, so there is no need to use fully qualified name like users/username/myfolder/mycollection - myfolder/mycollection is enough.
+The script will prompt the user for Google account password. The program will also check that all properties in path_to_metadata.csv do not contain any illegal characters for GEE. Don't need metadata? Simply skip this option.
 
 ### Upload a directory with images with specific NoData value to a selected destination 
 ```
-geebam upload -u my_account@gmail.com -d path_to_directory_with_tif -p projects/shared/folder --nodata 222
+geebam upload -u pinkiepie@gmail.com --source path_to_directory_with_tif --dest users/pinkiepie/myfolder/myponycollection --nodata 222
 ```
 In this case we need to supply full path to the destination, which is helpful when we upload to a shared folder. In the provided example we also burn value 222 into all rasters for missing data (NoData).
