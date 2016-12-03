@@ -23,6 +23,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Operating System :: OS Independent',
+        'Topic :: Scientific/Engineering :: GIS',
     ),
     author='Lukasz Tracewski',
     author_email='lukasz.tracewski@outlook.com',

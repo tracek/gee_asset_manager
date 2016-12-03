@@ -24,7 +24,7 @@ def validate_metadata_from_csv(path):
         logging.info('Running metatdata validator for %s', path)
         success = True
         reader = csv.reader(metadata_file)
-        header = reader.next()
+        header = next(reader)
 
         if not properties_allowed(properties=header, validator=allowed_property_key):
             raise IllegalPropertyName('The header has illegal name.')
@@ -61,7 +61,7 @@ def load_metadata_from_csv(path):
     """
     with open(path, mode='r') as metadata_file:
         reader = csv.reader(metadata_file)
-        header = reader.next()
+        header = next(reader)
 
         if not properties_allowed(properties=header, validator=allowed_property_key):
             raise IllegalPropertyName()
