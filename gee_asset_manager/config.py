@@ -53,5 +53,5 @@ def setup_logging():
             config = json.load(f)
     except Exception as e:
         logging.exception('Could not load logconfig.json. Loading default logging configuration.')
-        config = json.loads(default_config)
+        config = default_config
     logging.config.dictConfig(config)
