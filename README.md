@@ -59,8 +59,9 @@ for images, which is covered in the next section:
 ```
 geebam upload -h
 
-usage: GEE asset manager [-h] -u USER -d DIRECTORY [-m METADATA]
-                         [-c COLLECTION]
+usage: geebam upload [-h] -u USER --source SOURCE --dest DEST [-m METADATA]
+                     [--large] [--nodata NODATA]
+
 
 Google Earth Engine Batch Asset Uploader
 
