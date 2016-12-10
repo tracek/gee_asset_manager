@@ -46,7 +46,7 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
     all_images_paths = glob.glob(path)
 
     if len(all_images_paths) == 0:
-        logging.error('%s does not contain any tif images.')
+        logging.error('%s does not contain any tif images.', path)
         sys.exit(1)
 
     metadata = load_metadata_from_csv(metadata_path) if metadata_path else None
@@ -118,7 +118,11 @@ def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
     return path_to_local_assets
 
 
-@retrying.retry(wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
+def retry_if_ee_error(exception):
+    return isinstance(exception, ee.EEException)
+
+
+@retrying.retry(retry_on_exception=retry_if_ee_error, wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
 def __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, image_path, properties,
                                              multipart_upload, nodata_value):
     asset_request = __upload_file(session=google_session,
@@ -147,7 +151,7 @@ def __validate_metadata(path_for_upload, metadata_path):
 
     if not validation_result.success:
         print('Validation finished with errors. Type "y" to continue, default NO: ')
-        choice = raw_input().lower()
+        choice = input().lower()
         if choice not in ['y', 'yes']:
             logging.info('Application will terminate')
             exit(1)
@@ -190,6 +194,10 @@ def __get_google_auth_session(username, password):
 
 def __get_upload_url(session):
     r = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
+    if r.text.startswith('\n<!DOCTYPE html>'):
+        logging.error('Incorrect credentials. Probably. If you are sure the credentials are OK, refresh the authentication token. '
+                      'If it did not work report a problem. They might have changed something in the Matrix.')
+        sys.exit(1)
     d = ast.literal_eval(r.text)
     return d['url']
 

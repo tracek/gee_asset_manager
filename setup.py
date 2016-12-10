@@ -7,7 +7,7 @@ def readme():
 
 setup(
     name='geebam',
-    version='0.1.3',
+    version='0.1.4',
     packages=['gee_asset_manager'],
     package_data={'gee_asset_manager': ['logconfig.json']},
     url='https://github.com/tracek/gee_asset_manager',
@@ -34,7 +34,8 @@ setup(
         'requests',
         'earthengine-api',
         'requests_toolbelt',
-        'bs4'
+        'bs4',
+        'pytest'
     ],
     entry_points={
         'console_scripts': [
