@@ -1,13 +1,15 @@
-import pytest
 import getpass
-import os
-import string
-import random
 import logging
-import ee
-from gee_asset_manager.batch_uploader import upload
-from gee_asset_manager.batch_remover import delete
+import os
+import random
+import string
 
+import ee
+import pytest
+from builtins import input
+
+from gee_asset_manager.batch_remover import delete
+from gee_asset_manager.batch_uploader import upload
 
 logging.basicConfig(level=logging.INFO)
 
@@ -74,7 +76,7 @@ def test_upload_with_nodata_multipart(monkeypatch, setup_testfolder):
 
 
 def test_delete(setup_testfolder):
-    ee.data.createAsset({'type': ee.data.ASSET_TYPE_FOLDER}, setup_testfolder + 'one_more_to_delete')
+    ee.data.createAsset({'type': ee.data.ASSET_TYPE_FOLDER}, setup_testfolder + '/one_more_to_delete')
     logging.info('Removing test directory')
     delete(setup_testfolder)
     info = ee.data.getInfo(setup_testfolder)
