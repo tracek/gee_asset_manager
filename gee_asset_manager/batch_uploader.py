@@ -189,6 +189,10 @@ def __get_google_auth_session(username, password):
     payload['GALX'] = galx
 
     session.post(authentication_url, data=payload)
+
+    # get url and discard; somehow it does not work for the first time
+    session.get('https://ee-api.appspot.com/assets/upload/geturl?')
+
     return session
 
 
@@ -304,10 +308,10 @@ class FailedAssetsWriter(object):
                 self.failed_upload_file = open('failed_upload.csv', 'w')
             else:
                 self.failed_upload_file = open('failed_upload.csv', 'wb')
-            failed_upload_writer = csv.writer(self.failed_upload_file)
-            failed_upload_writer.writerow(['filename', 'task_id', 'error_msg'])
+            self.failed_upload_writer = csv.writer(self.failed_upload_file)
+            self.failed_upload_writer.writerow(['filename', 'task_id', 'error_msg'])
             self.initialized = True
-        failed_upload_writer.writerow(row)
+        self.failed_upload_writer.writerow(row)
 
     def close(self):
         if self.initialized:
