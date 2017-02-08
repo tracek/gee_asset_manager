@@ -2,8 +2,6 @@
 
 import argparse
 import logging
-import os
-import sys
 
 import ee
 
@@ -42,7 +40,7 @@ def main(args=None):
     parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Manager')
 
     subparsers = parser.add_subparsers()
-    parser_delete = subparsers.add_parser('delete', help='Deletes collection and all items inside.')
+    parser_delete = subparsers.add_parser('delete', help='Deletes collection and all items inside. Supports Unix-like wildcards.')
     parser_delete.add_argument('id', help='Full path to asset for deletion. Recursively removes all folders, collections and images.')
     parser_delete.set_defaults(func=delete_collection_from_parser)
 

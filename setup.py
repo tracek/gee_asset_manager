@@ -35,7 +35,8 @@ setup(
         'earthengine-api',
         'requests_toolbelt',
         'bs4',
-        'pytest'
+        'pytest',
+        'future'
     ],
     entry_points={
         'console_scripts': [

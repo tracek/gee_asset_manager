@@ -63,7 +63,7 @@ usage: geebam upload [-h] -u USER --source SOURCE --dest DEST [-m METADATA]
                      [--large] [--nodata NODATA]
 
 
-Google Earth Engine Batch Asset Uploader
+Google Earth Engine Batch Asset Manager
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -128,6 +128,13 @@ Console output:
 2016-07-17 16:14:10,842 :: root :: INFO :: Attempting to delete collection test
 2016-07-17 16:14:16,898 :: root :: INFO :: Collection users/pinkiepie/test removed
 ```
+
+### Delete all directories / collections based on a Unix-like pattern
+
+```
+geebam delete users/pinkiepie/*weird[0-9]?name*
+```
+
 
 ### Upload a directory with images to your myfolder/mycollection and associate properties with each image:
 ```

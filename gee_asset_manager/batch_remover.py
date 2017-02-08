@@ -1,3 +1,4 @@
+import fnmatch
 import logging
 import sys
 
@@ -5,8 +6,16 @@ import ee
 
 
 def delete(asset_path):
-    __delete_recursive(asset_path)
-    logging.info('Collection %s removed', asset_path)
+    root = asset_path[:asset_path.rfind('/')]
+    all_assets_names = [e['id'] for e in ee.data.getList({'id': root})]
+    filtered_names = fnmatch.filter(all_assets_names, asset_path)
+    if not filtered_names:
+        logging.warning('Nothing to remove. Exiting.')
+        sys.exit(1)
+    else:
+        for path in filtered_names:
+            __delete_recursive(path)
+            logging.info('Collection %s removed', path)
 
 
 def __delete_recursive(asset_path):
@@ -26,8 +35,3 @@ def __delete_recursive(asset_path):
         for item in items_in_destination:
             ee.data.deleteAsset(item['id'])
     ee.data.deleteAsset(asset_path)
-
-
-if __name__ == '__main__':
-    ee.Initialize()
-    delete('testfolder')
