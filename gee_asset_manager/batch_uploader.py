@@ -1,10 +1,10 @@
 import ast
+import csv
 import getpass
 import glob
 import logging
 import os
 import sys
-import csv
 import time
 
 if sys.version_info > (3, 0):
@@ -197,6 +197,7 @@ def __get_google_auth_session(username, password):
 
 
 def __get_upload_url(session):
+    _ = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
     r = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
     if r.text.startswith('\n<!DOCTYPE html>'):
         logging.error('Incorrect credentials. Probably. If you are sure the credentials are OK, refresh the authentication token. '
