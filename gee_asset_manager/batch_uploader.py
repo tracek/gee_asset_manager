@@ -190,13 +190,11 @@ def __get_google_auth_session(username, password):
 
     session.post(authentication_url, data=payload)
 
-    # get url and discard; somehow it does not work for the first time
-    session.get('https://ee-api.appspot.com/assets/upload/geturl?')
-
     return session
 
 
 def __get_upload_url(session):
+    # get url and discard; somehow it does not work for the first time
     _ = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
     r = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
     if r.text.startswith('\n<!DOCTYPE html>'):
