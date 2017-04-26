@@ -14,7 +14,7 @@ Google Earth Engine Batch Asset Manager ambition is helping user with batch acti
 We assume Earth Engine Python API is installed and EE authorised as desribed [here](https://developers.google.com/earth-engine/python_install). To install:
 ```
 git clone https://github.com/tracek/gee_asset_manager
-cd gee_asset_manager && pip install .
+cd gee_asset_manager && pip install -e .
 ```
 
 Installation is an optional step; the application can be also run
