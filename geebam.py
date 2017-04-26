@@ -54,6 +54,10 @@ def main(args=None):
     optional_named.add_argument('--large', action='store_true', help='(Advanced) Use multipart upload. Might help if upload of large '
                                                                      'files is failing on some systems. Might cause other issues.')
     optional_named.add_argument('--nodata', type=int, help='The value to burn into the raster as NoData (missing data)')
+
+    optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
+    optional_named.add_argument('-p', '--private-key', help='Google Earth Engine private key file.')
+
     parser_upload.set_defaults(func=upload_from_parser)
 
     parser_cancel = subparsers.add_parser('cancel', help='Cancel all running tasks')
@@ -61,7 +65,12 @@ def main(args=None):
 
     args = parser.parse_args()
 
-    ee.Initialize()
+    if args.service_account:
+        credentials = ee.ServiceAccountCredentials(args.service_account, args.private_key)
+        ee.Initialize(credentials)
+    else:
+        ee.Initialize()
+    
     args.func(args)
 
 if __name__ == '__main__':
