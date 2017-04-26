@@ -21,7 +21,7 @@ from bs4 import BeautifulSoup
 from .metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
 
 
-def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None):
+def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None, password=None):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -51,7 +51,7 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
 
     metadata = load_metadata_from_csv(metadata_path) if metadata_path else None
 
-    password = getpass.getpass()
+    password = password if password is not None else getpass.getpass()
     google_session = __get_google_auth_session(user, password)
 
     __create_image_collection(destination_path)
@@ -92,8 +92,7 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
 
 
 def __verify_path_for_upload(path):
-    folder = path[:path.rfind('/')]
-    response = ee.data.getInfo(folder)
+    response = ee.data.getInfo(path)
     if not response:
         logging.error('%s is not a valid destination. Make sure full path is provided e.g. users/user/nameofcollection '
                       'or projects/myproject/myfolder/newcollection and that you have write access there.', path)

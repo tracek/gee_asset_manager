@@ -32,7 +32,8 @@ def upload_from_parser(args):
            destination_path=args.dest,
            metadata_path=args.metadata,
            multipart_upload=args.large,
-           nodata_value=args.nodata)
+           nodata_value=args.nodata,
+           password=args.password)
 
 
 def main(args=None):
@@ -44,7 +45,7 @@ def main(args=None):
     parser_delete.add_argument('id', help='Full path to asset for deletion. Recursively removes all folders, collections and images.')
     parser_delete.set_defaults(func=delete_collection_from_parser)
     parser_delete.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
-    parser_delete.add_argument('-p', '--private-key', help='Google Earth Engine private key file.')
+    parser_delete.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
 
     parser_upload = subparsers.add_parser('upload', help='Batch Asset Uploader.')
     required_named = parser_upload.add_argument_group('Required named arguments.')
@@ -58,14 +59,15 @@ def main(args=None):
     optional_named.add_argument('--nodata', type=int, help='The value to burn into the raster as NoData (missing data)')
 
     optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
-    optional_named.add_argument('-p', '--private-key', help='Google Earth Engine private key file.')
+    optional_named.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
+    optional_named.add_argument('-p', '--password', help='Google account password.')
 
     parser_upload.set_defaults(func=upload_from_parser)
 
     parser_cancel = subparsers.add_parser('cancel', help='Cancel all running tasks')
     parser_cancel.set_defaults(func=cancel_all_running_tasks_from_parser)
     parser_cancel.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
-    parser_cancel.add_argument('-p', '--private-key', help='Google Earth Engine private key file.')
+    parser_cancel.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
 
     args = parser.parse_args()
 
