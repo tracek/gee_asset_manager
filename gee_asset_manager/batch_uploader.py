@@ -254,7 +254,7 @@ def __check_for_failed_tasks_and_report(tasks, writer):
             task_id = status['id']
             filename = tasks[task_id]
             error_message = status['error_message']
-            writer.writerow(filename, task_id, error_message)
+            writer.writerow([filename, task_id, error_message])
             logging.error('Ingestion of image %s has failed with message %s', filename, error_message)
 
     tasks.clear()
