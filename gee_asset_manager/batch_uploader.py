@@ -92,7 +92,8 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
 
 
 def __verify_path_for_upload(path):
-    response = ee.data.getInfo(path)
+    folder = path[:path.rfind('/')]
+    response = ee.data.getInfo(folder)
     if not response:
         logging.error('%s is not a valid destination. Make sure full path is provided e.g. users/user/nameofcollection '
                       'or projects/myproject/myfolder/newcollection and that you have write access there.', path)
