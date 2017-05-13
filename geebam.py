@@ -2,7 +2,7 @@
 
 import argparse
 import logging
-
+import os
 import ee
 
 from gee_asset_manager.batch_remover import delete
@@ -33,7 +33,7 @@ def upload_from_parser(args):
            metadata_path=args.metadata,
            multipart_upload=args.large,
            nodata_value=args.nodata,
-           password=args.password)
+           bucket_name=args.bucket)
 
 
 def main(args=None):
@@ -49,7 +49,6 @@ def main(args=None):
 
     parser_upload = subparsers.add_parser('upload', help='Batch Asset Uploader.')
     required_named = parser_upload.add_argument_group('Required named arguments.')
-    required_named.add_argument('-u', '--user', help='Google account name (gmail address).', required=True)
     required_named.add_argument('--source', help='Path to the directory with images for upload.', required=True)
     required_named.add_argument('--dest', help='Destination. Full path for upload to Google Earth Engine, e.g. users/pinkiepie/myponycollection', required=True)
     optional_named = parser_upload.add_argument_group('Optional named arguments')
@@ -58,9 +57,10 @@ def main(args=None):
                                                                      'files is failing on some systems. Might cause other issues.')
     optional_named.add_argument('--nodata', type=int, help='The value to burn into the raster as NoData (missing data)')
 
+    required_named.add_argument('-u', '--user', help='Google account name (gmail address).')
     optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
     optional_named.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
-    optional_named.add_argument('-p', '--password', help='Google account password.')
+    optional_named.add_argument('-b', '--bucket', help='Google Cloud Storage bucket name.')
 
     parser_upload.set_defaults(func=upload_from_parser)
 
@@ -76,7 +76,10 @@ def main(args=None):
         ee.Initialize(credentials)
     else:
         ee.Initialize()
-    
+
+    if args.private_key is not None:
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = args.private_key
+
     args.func(args)
 
 if __name__ == '__main__':
