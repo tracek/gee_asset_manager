@@ -104,7 +104,9 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
     failed_asset_writer.close()
 
 def __create_asset_request(asset_full_path, gsid, properties, nodata_value):
-    return {"id": asset_full_path,
+    asset_id = asset_full_path.replace('.', '-')
+
+    return {"id": asset_id,
         "tilesets": [
             {"sources": [
                 {"primaryPath": gsid,
