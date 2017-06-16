@@ -4,10 +4,13 @@ def readme():
     with open('README.md') as f:
         return f.read()
 
+def requirements():
+    with open('requirements.txt') as f:
+        return f.read().splitlines()
 
 setup(
     name='geebam',
-    version='0.1.4',
+    version='0.1.5',
     packages=['gee_asset_manager'],
     package_data={'gee_asset_manager': ['logconfig.json']},
     url='https://github.com/tracek/gee_asset_manager',
@@ -29,15 +32,7 @@ setup(
     author_email='lukasz.tracewski@outlook.com',
     description='Google Earth Engine Batch Assets Manager',
     long_description=readme(),
-    install_requires=[
-        'retrying',
-        'requests',
-        'earthengine-api',
-        'requests_toolbelt',
-        'bs4',
-        'pytest',
-        'future'
-    ],
+    install_requires=requirements(),
     entry_points={
         'console_scripts': [
             'geebam=geebam:main',

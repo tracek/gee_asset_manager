@@ -2,7 +2,7 @@
 
 import argparse
 import logging
-
+import os
 import ee
 
 from gee_asset_manager.batch_remover import delete
@@ -32,7 +32,8 @@ def upload_from_parser(args):
            destination_path=args.dest,
            metadata_path=args.metadata,
            multipart_upload=args.large,
-           nodata_value=args.nodata)
+           nodata_value=args.nodata,
+           bucket_name=args.bucket)
 
 
 def main(args=None):
@@ -43,10 +44,11 @@ def main(args=None):
     parser_delete = subparsers.add_parser('delete', help='Deletes collection and all items inside. Supports Unix-like wildcards.')
     parser_delete.add_argument('id', help='Full path to asset for deletion. Recursively removes all folders, collections and images.')
     parser_delete.set_defaults(func=delete_collection_from_parser)
+    parser_delete.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
+    parser_delete.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
 
     parser_upload = subparsers.add_parser('upload', help='Batch Asset Uploader.')
     required_named = parser_upload.add_argument_group('Required named arguments.')
-    required_named.add_argument('-u', '--user', help='Google account name (gmail address).', required=True)
     required_named.add_argument('--source', help='Path to the directory with images for upload.', required=True)
     required_named.add_argument('--dest', help='Destination. Full path for upload to Google Earth Engine, e.g. users/pinkiepie/myponycollection', required=True)
     optional_named = parser_upload.add_argument_group('Optional named arguments')
@@ -54,14 +56,30 @@ def main(args=None):
     optional_named.add_argument('--large', action='store_true', help='(Advanced) Use multipart upload. Might help if upload of large '
                                                                      'files is failing on some systems. Might cause other issues.')
     optional_named.add_argument('--nodata', type=int, help='The value to burn into the raster as NoData (missing data)')
+
+    required_named.add_argument('-u', '--user', help='Google account name (gmail address).')
+    optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
+    optional_named.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
+    optional_named.add_argument('-b', '--bucket', help='Google Cloud Storage bucket name.')
+
     parser_upload.set_defaults(func=upload_from_parser)
 
     parser_cancel = subparsers.add_parser('cancel', help='Cancel all running tasks')
     parser_cancel.set_defaults(func=cancel_all_running_tasks_from_parser)
+    parser_cancel.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
+    parser_cancel.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
 
     args = parser.parse_args()
 
-    ee.Initialize()
+    if args.service_account:
+        credentials = ee.ServiceAccountCredentials(args.service_account, args.private_key)
+        ee.Initialize(credentials)
+    else:
+        ee.Initialize()
+
+    if args.private_key is not None:
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = args.private_key
+
     args.func(args)
 
 if __name__ == '__main__':
