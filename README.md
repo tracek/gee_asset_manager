@@ -59,20 +59,18 @@ for images, which is covered in the next section:
 ```
 geebam upload -h
 
-usage: geebam upload [-h] -u USER --source SOURCE --dest DEST [-m METADATA]
-                     [--large] [--nodata NODATA]
-
-
-Google Earth Engine Batch Asset Manager
+usage: geebam upload [-h] --source SOURCE --dest DEST [-m METADATA] [--large]
+                     [--nodata NODATA] [-u USER] [-s SERVICE_ACCOUNT]
+                     [-k PRIVATE_KEY] [-b BUCKET]
 
 optional arguments:
   -h, --help            show this help message and exit
 
 Required named arguments.:
-  -u USER, --user USER  Google account name (gmail address).
   --source SOURCE       Path to the directory with images for upload.
   --dest DEST           Destination. Full path for upload to Google Earth
                         Engine, e.g. users/pinkiepie/myponycollection
+  -u USER, --user USER  Google account name (gmail address).
 
 Optional named arguments:
   -m METADATA, --metadata METADATA
@@ -82,6 +80,12 @@ Optional named arguments:
                         other issues.
   --nodata NODATA       The value to burn into the raster as NoData (missing
                         data)
+  -s SERVICE_ACCOUNT, --service-account SERVICE_ACCOUNT
+                        Google Earth Engine service account.
+  -k PRIVATE_KEY, --private-key PRIVATE_KEY
+                        Google Earth Engine private key file.
+  -b BUCKET, --bucket BUCKET
+                        Google Cloud Storage bucket name
 
 ```
 

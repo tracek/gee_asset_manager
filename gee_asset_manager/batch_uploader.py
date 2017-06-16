@@ -18,10 +18,12 @@ import retrying
 from requests_toolbelt.multipart import encoder
 from bs4 import BeautifulSoup
 
+from google.cloud import storage
+
 from .metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
 
 
-def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None):
+def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None, bucket_name=None):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -51,8 +53,11 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
 
     metadata = load_metadata_from_csv(metadata_path) if metadata_path else None
 
-    password = getpass.getpass()
-    google_session = __get_google_auth_session(user, password)
+    if user is not None:
+        password = getpass.getpass()
+        google_session = __get_google_auth_session(user, password)
+    else:
+        storage_client = storage.Client()
 
     __create_image_collection(destination_path)
 
@@ -79,8 +84,16 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
         properties = metadata[filename] if metadata else None
 
         try:
-            task_id = __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, image_path,
-                                                               properties, multipart_upload, nodata_value)
+            if user is not None:
+                gsid = __upload_file_gee(session=google_session,
+                                                  file_path=image_path,
+                                                  use_multipart=multipart_upload)
+            else:
+                gsid = __upload_file_gcs(storage_client, bucket_name, image_path)
+
+            asset_request = __create_asset_request(asset_full_path, gsid, properties, nodata_value)
+
+            task_id = __start_ingestion_task(asset_request)
             submitted_tasks_id[task_id] = filename
             __periodic_check(current_image=current_image_no, period=20, tasks=submitted_tasks_id, writer=failed_asset_writer)
         except Exception as e:
@@ -90,6 +103,19 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
     __check_for_failed_tasks_and_report(tasks=submitted_tasks_id, writer=failed_asset_writer)
     failed_asset_writer.close()
 
+def __create_asset_request(asset_full_path, gsid, properties, nodata_value):
+    return {"id": asset_full_path,
+        "tilesets": [
+            {"sources": [
+                {"primaryPath": gsid,
+                 "additionalPaths": []
+                 }
+            ]}
+        ],
+        "bands": [],
+        "properties": properties,
+        "missingData": {"value": nodata_value}
+    }
 
 def __verify_path_for_upload(path):
     folder = path[:path.rfind('/')]
@@ -123,14 +149,7 @@ def retry_if_ee_error(exception):
 
 
 @retrying.retry(retry_on_exception=retry_if_ee_error, wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
-def __upload_to_gcs_and_start_ingestion_task(asset_full_path, google_session, image_path, properties,
-                                             multipart_upload, nodata_value):
-    asset_request = __upload_file(session=google_session,
-                                  file_path=image_path,
-                                  asset_name=asset_full_path,
-                                  use_multipart=multipart_upload,
-                                  properties=properties,
-                                  nodata=nodata_value)
+def __start_ingestion_task(asset_request):
     task_id = ee.data.newTaskId(1)[0]
     _ = ee.data.startIngestion(task_id, asset_request)
     return task_id
@@ -202,8 +221,8 @@ def __get_upload_url(session):
     d = ast.literal_eval(r.text)
     return d['url']
 
-
-def __upload_file(session, file_path, asset_name, use_multipart, properties=None, nodata=None):
+@retrying.retry(retry_on_exception=retry_if_ee_error, wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
+def __upload_file_gee(session, file_path, use_multipart):
     with open(file_path, 'rb') as f:
         upload_url = __get_upload_url(session)
 
@@ -219,20 +238,20 @@ def __upload_file(session, file_path, asset_name, use_multipart, properties=None
             resp = session.post(upload_url, files=files)
 
         gsid = resp.json()[0]
-        asset_data = {"id": asset_name,
-                      "tilesets": [
-                          {"sources": [
-                              {"primaryPath": gsid,
-                               "additionalPaths": []
-                              }
-                          ]}
-                      ],
-                      "bands": [],
-                      "properties": properties,
-                      "missingData": {"value": nodata}
-                      }
-        return asset_data
 
+        return gsid
+
+@retrying.retry(retry_on_exception=retry_if_ee_error, wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
+def __upload_file_gcs(storage_client, bucket_name, image_path):
+    bucket = storage_client.get_bucket(bucket_name)
+    blob_name = __get_filename_from_path(path=image_path)
+    blob = bucket.blob(blob_name)
+
+    blob.upload_from_filename(image_path)
+
+    url = 'gs://' + bucket_name + '/' + blob_name
+
+    return url
 
 def __periodic_check(current_image, period, tasks, writer):
     if (current_image + 1) % period == 0:
@@ -253,7 +272,7 @@ def __check_for_failed_tasks_and_report(tasks, writer):
             task_id = status['id']
             filename = tasks[task_id]
             error_message = status['error_message']
-            writer.writerow(filename, task_id, error_message)
+            writer.writerow([filename, task_id, error_message])
             logging.error('Ingestion of image %s has failed with message %s', filename, error_message)
 
     tasks.clear()
