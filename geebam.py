@@ -33,7 +33,21 @@ def upload_from_parser(args):
            metadata_path=args.metadata,
            multipart_upload=args.large,
            nodata_value=args.nodata,
-           bucket_name=args.bucket)
+           bucket_name=args.bucket,
+           band_names=args.bands)
+
+def _comma_separated_strings(string):
+  """Parses an input consisting of comma-separated strings.
+     Slightly modified version of: https://pypkg.com/pypi/earthengine-api/f/ee/cli/commands.py
+  """
+  error_msg = 'Argument should be a comma-separated list of alphanumeric strings (no spaces or other' \
+              'special characters): {}'
+  values = string.split(',')
+  for name in values:
+      if not name.isalnum():
+          raise argparse.ArgumentTypeError(error_msg.format(string))
+  return values
+
 
 
 def main(args=None):
@@ -56,6 +70,8 @@ def main(args=None):
     optional_named.add_argument('--large', action='store_true', help='(Advanced) Use multipart upload. Might help if upload of large '
                                                                      'files is failing on some systems. Might cause other issues.')
     optional_named.add_argument('--nodata', type=int, help='The value to burn into the raster as NoData (missing data)')
+    optional_named.add_argument('--bands', type=_comma_separated_strings, help='Comma-separated list of names to use for the image bands. Spaces'
+                                                                               'or other special characters are not allowed.')
 
     required_named.add_argument('-u', '--user', help='Google account name (gmail address).')
     optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')

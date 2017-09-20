@@ -23,7 +23,7 @@ from google.cloud import storage
 from .metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
 
 
-def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None, bucket_name=None):
+def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None, bucket_name=None, band_names=[]):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -91,7 +91,7 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
             else:
                 gsid = __upload_file_gcs(storage_client, bucket_name, image_path)
 
-            asset_request = __create_asset_request(asset_full_path, gsid, properties, nodata_value)
+            asset_request = __create_asset_request(asset_full_path, gsid, properties, nodata_value, band_names)
 
             task_id = __start_ingestion_task(asset_request)
             submitted_tasks_id[task_id] = filename
@@ -103,7 +103,10 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
     __check_for_failed_tasks_and_report(tasks=submitted_tasks_id, writer=failed_asset_writer)
     failed_asset_writer.close()
 
-def __create_asset_request(asset_full_path, gsid, properties, nodata_value):
+def __create_asset_request(asset_full_path, gsid, properties, nodata_value, band_names):
+    if band_names:
+        band_names = [{'id': name} for name in band_names]
+
     return {"id": asset_full_path,
         "tilesets": [
             {"sources": [
@@ -112,7 +115,7 @@ def __create_asset_request(asset_full_path, gsid, properties, nodata_value):
                  }
             ]}
         ],
-        "bands": [],
+        "bands": band_names,
         "properties": properties,
         "missingData": {"value": nodata_value}
     }
