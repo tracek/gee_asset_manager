@@ -32,6 +32,7 @@ def report(filename):
     ee.Initialize()
     assets_root = ee.data.getAssetRoots()
     writer = ReportWriter(filename)
+    writer.writerow(['Asset id', 'Type', 'Size [MB]', 'Time', 'Owners', 'Readers', 'Writers'])
 
     for asset in assets_root:
         # List size+name for every leaf asset, and show totals for non-leaves.
