@@ -80,9 +80,9 @@ Optional named arguments:
                         other issues.
   --nodata NODATA       The value to burn into the raster as NoData (missing
                         data)
-  -s SERVICE_ACCOUNT, --service-account SERVICE_ACCOUNT
+  -s SERVICE_ACCOUNT, --serviceaccount SERVICE_ACCOUNT
                         Google Earth Engine service account.
-  -k PRIVATE_KEY, --private-key PRIVATE_KEY
+  -k PRIVATE_KEY, --privatekey PRIVATE_KEY
                         Google Earth Engine private key file.
   -b BUCKET, --bucket BUCKET
                         Google Cloud Storage bucket name

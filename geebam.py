@@ -8,6 +8,7 @@ import ee
 from gee_asset_manager.batch_remover import delete
 from gee_asset_manager.batch_uploader import upload
 from gee_asset_manager.config import setup_logging
+from gee_asset_manager.batch_info import report
 
 
 def cancel_all_running_tasks():
@@ -26,6 +27,10 @@ def delete_collection_from_parser(args):
     delete(args.id)
 
 
+def produce_report(args):
+    report(args.filename)
+
+
 def upload_from_parser(args):
     upload(user=args.user,
            source_path=args.source,
@@ -35,6 +40,7 @@ def upload_from_parser(args):
            nodata_value=args.nodata,
            bucket_name=args.bucket,
            band_names=args.bands)
+
 
 def _comma_separated_strings(string):
   """Parses an input consisting of comma-separated strings.
@@ -53,13 +59,13 @@ def _comma_separated_strings(string):
 def main(args=None):
     setup_logging()
     parser = argparse.ArgumentParser(description='Google Earth Engine Batch Asset Manager')
+    parser.add_argument('-s', '--service-account', help='Google Earth Engine service account.', required=False)
+    parser.add_argument('-k', '--private-key', help='Google Earth Engine private key file.', required=False)
 
     subparsers = parser.add_subparsers()
     parser_delete = subparsers.add_parser('delete', help='Deletes collection and all items inside. Supports Unix-like wildcards.')
     parser_delete.add_argument('id', help='Full path to asset for deletion. Recursively removes all folders, collections and images.')
     parser_delete.set_defaults(func=delete_collection_from_parser)
-    parser_delete.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
-    parser_delete.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
 
     parser_upload = subparsers.add_parser('upload', help='Batch Asset Uploader.')
     required_named = parser_upload.add_argument_group('Required named arguments.')
@@ -74,16 +80,16 @@ def main(args=None):
                                                                                'or other special characters are not allowed.')
 
     required_named.add_argument('-u', '--user', help='Google account name (gmail address).')
-    optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
-    optional_named.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
     optional_named.add_argument('-b', '--bucket', help='Google Cloud Storage bucket name.')
 
     parser_upload.set_defaults(func=upload_from_parser)
 
     parser_cancel = subparsers.add_parser('cancel', help='Cancel all running tasks')
     parser_cancel.set_defaults(func=cancel_all_running_tasks_from_parser)
-    parser_cancel.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
-    parser_cancel.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
+
+    parser_info = subparsers.add_parser('report', help='Produce summary of all assets.')
+    parser_info.set_defaults(func=produce_report)
+    parser_info.add_argument('--filename', help='File name for the output CSV (optional)')
 
     args = parser.parse_args()
 
