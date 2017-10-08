@@ -27,18 +27,21 @@ recommend installation within virtual environment.
 As usual, to print help:
 ```
 geebam -h
-usage: geebam [-h] {delete,upload,cancel} ...
-
-Google Earth Engine Batch Asset Manager
 
 positional arguments:
-  {delete,upload,cancel}
-    delete              Deletes collection and all items inside.
+  {delete,upload,cancel,report}
+    delete              Deletes collection and all items inside. Supports
+                        Unix-like wildcards.
     upload              Batch Asset Uploader.
     cancel              Cancel all running tasks
+    report              Produce summary of all assets.
 
 optional arguments:
   -h, --help            show this help message and exit
+  -s SERVICE_ACCOUNT, --service-account SERVICE_ACCOUNT
+                        Google Earth Engine service account.
+  -k PRIVATE_KEY, --private-key PRIVATE_KEY
+                        Google Earth Engine private key file.
 ```
 
 To obtain help for a specific functionality, simply call it with _help_
@@ -80,10 +83,6 @@ Optional named arguments:
                         other issues.
   --nodata NODATA       The value to burn into the raster as NoData (missing
                         data)
-  -s SERVICE_ACCOUNT, --serviceaccount SERVICE_ACCOUNT
-                        Google Earth Engine service account.
-  -k PRIVATE_KEY, --privatekey PRIVATE_KEY
-                        Google Earth Engine private key file.
   -b BUCKET, --bucket BUCKET
                         Google Cloud Storage bucket name
 
