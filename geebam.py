@@ -9,6 +9,7 @@ from gee_asset_manager.batch_remover import delete
 from gee_asset_manager.batch_uploader import upload
 from gee_asset_manager.config import setup_logging
 from gee_asset_manager.batch_info import report
+from gee_asset_manager.batch_copy import copy
 
 
 def cancel_all_running_tasks():
@@ -29,6 +30,10 @@ def delete_collection_from_parser(args):
 
 def produce_report(args):
     report(args.filename)
+
+
+def batch_copy(args):
+    copy(args.source, args.dest)
 
 
 def upload_from_parser(args):
@@ -90,6 +95,11 @@ def main(args=None):
     parser_info = subparsers.add_parser('report', help='Produce summary of all assets.')
     parser_info.set_defaults(func=produce_report)
     parser_info.add_argument('--filename', help='File name for the output CSV (optional)')
+
+    parser_copy = subparsers.add_parser('copy', help='Batch copy of assets. Helps in migrating assets from Google Maps to GEE')
+    parser_copy.set_defaults(func=batch_copy)
+    parser_copy.add_argument('--source', help='File with the following structure: [asset name],[asset id in GME]')
+    parser_copy.add_argument('--dest', help='Full path to the directory or collection in EE')
 
     args = parser.parse_args()
 
