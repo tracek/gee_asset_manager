@@ -16,7 +16,7 @@ def copy(source, destination):
                 ee.data.copyAsset(gme_path, ee_path)
             except ee.EEException as e:
                 with open('failed_batch_copy.csv', 'w') as fout:
-                    fout.write('%s,%s,%s,%s'.format(name, gme_id, ee_path,e))
+                    fout.write('{},{},{},{}'.format(name, gme_id, ee_path,e))
 
 
 if __name__ == '__main__':
