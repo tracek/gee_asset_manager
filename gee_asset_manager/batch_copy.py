@@ -12,7 +12,11 @@ def copy(source, destination):
             gme_path = 'GME/images/' + gme_id
             ee_path = os.path.join(destination, name)
             logging.info('Copying asset %s to %s', gme_path, ee_path)
-            ee.data.copyAsset(gme_path, ee_path)
+            try:
+                ee.data.copyAsset(gme_path, ee_path)
+            except ee.EEException as e:
+                with open('failed_batch_copy.csv', 'w') as fout:
+                    fout.write('%s,%s,%s,%s', name, gme_id, ee_path,e)
 
 
 if __name__ == '__main__':
