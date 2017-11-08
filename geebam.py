@@ -112,6 +112,11 @@ def main(args=None):
     if args.private_key is not None:
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = args.private_key
 
+    if 'func' in args:
+        args.func(args)
+    else:
+        parser.print_help()
+
     args.func(args)
 
 if __name__ == '__main__':
