@@ -136,7 +136,5 @@ def main(args=None):
     else:
         parser.print_help()
 
-    args.func(args)
-
 if __name__ == '__main__':
     main()
