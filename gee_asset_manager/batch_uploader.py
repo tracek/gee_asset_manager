@@ -42,7 +42,16 @@ from google.cloud import storage
 from .metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
 
 
-def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None, bucket_name=None, band_names=[]):
+def upload(
+        user,
+        source_path,
+        destination_path,
+        metadata_path=None,
+        multipart_upload=False,
+        nodata_value=None,
+        bucket_name=None,
+        band_names=[],
+        signal_if_error = False):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -88,6 +97,7 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
         sys.exit(1)
 
     failed_asset_writer = FailedAssetsWriter()
+    got_errors = False
 
     for current_image_no, image_path in enumerate(images_for_upload_path):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
@@ -105,8 +115,8 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
         try:
             if user is not None:
                 gsid = __upload_file_gee(session=google_session,
-                                                  file_path=image_path,
-                                                  use_multipart=multipart_upload)
+                                         file_path=image_path,
+                                         use_multipart=multipart_upload)
             else:
                 gsid = __upload_file_gcs(storage_client, bucket_name, image_path)
 
@@ -118,26 +128,29 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
             failed_asset_writer.writerow([filename, 0, str(e)])
+            got_errors = True
 
     __check_for_failed_tasks_and_report(tasks=submitted_tasks_id, writer=failed_asset_writer)
     failed_asset_writer.close()
+    if signal_if_error and got_errors:
+        sys.exit(1)
 
 def __create_asset_request(asset_full_path, gsid, properties, nodata_value, band_names):
     if band_names:
         band_names = [{'id': name} for name in band_names]
 
     return {"id": asset_full_path,
-        "tilesets": [
-            {"sources": [
-                {"primaryPath": gsid,
-                 "additionalPaths": []
-                 }
-            ]}
-        ],
-        "bands": band_names,
-        "properties": properties,
-        "missingData": {"value": nodata_value}
-    }
+            "tilesets": [
+                {"sources": [
+                    {"primaryPath": gsid,
+                     "additionalPaths": []
+                     }
+                ]}
+            ],
+            "bands": band_names,
+            "properties": properties,
+            "missingData": {"value": nodata_value}
+            }
 
 def __verify_path_for_upload(path):
     folder = path[:path.rfind('/')]

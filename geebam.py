@@ -22,6 +22,7 @@ __license__ = "Apache 2.0"
 import argparse
 import logging
 import os
+
 import ee
 
 from gee_asset_manager.batch_remover import delete
@@ -39,7 +40,7 @@ def cancel_all_running_tasks():
 
 def cancel_all_running_tasks_from_parser(args):
     cancel_all_running_tasks()
-    
+
 
 def delete_collection_from_parser(args):
     delete(args.id)
@@ -53,19 +54,20 @@ def upload_from_parser(args):
            multipart_upload=args.large,
            nodata_value=args.nodata,
            bucket_name=args.bucket,
-           band_names=args.bands)
+           band_names=args.bands,
+           signal_if_error=args.upload_catch_error)
 
 def _comma_separated_strings(string):
-  """Parses an input consisting of comma-separated strings.
-     Slightly modified version of: https://pypkg.com/pypi/earthengine-api/f/ee/cli/commands.py
-  """
-  error_msg = 'Argument should be a comma-separated list of alphanumeric strings (no spaces or other' \
-              'special characters): {}'
-  values = string.split(',')
-  for name in values:
-      if not name.isalnum():
-          raise argparse.ArgumentTypeError(error_msg.format(string))
-  return values
+    """Parses an input consisting of comma-separated strings.
+       Slightly modified version of: https://pypkg.com/pypi/earthengine-api/f/ee/cli/commands.py
+    """
+    error_msg = 'Argument should be a comma-separated list of alphanumeric strings (no spaces or other' \
+                'special characters): {}'
+    values = string.split(',')
+    for name in values:
+        if not name.isalnum():
+            raise argparse.ArgumentTypeError(error_msg.format(string))
+    return values
 
 
 
@@ -96,6 +98,11 @@ def main(args=None):
     optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
     optional_named.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
     optional_named.add_argument('-b', '--bucket', help='Google Cloud Storage bucket name.')
+    optional_named.add_argument(
+        '-e',
+        '--upload-catch-error',
+        action='store_true',
+        help='Return exit code 1 when upload catches an error')
 
     parser_upload.set_defaults(func=upload_from_parser)
 
