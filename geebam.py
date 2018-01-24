@@ -55,7 +55,8 @@ def upload_from_parser(args):
            nodata_value=args.nodata,
            bucket_name=args.bucket,
            band_names=args.bands,
-           signal_if_error=args.upload_catch_error)
+           signal_if_error=args.upload_catch_error,
+           tolerate_assets_already_exist=args.tolerate_assets_already_exist)
 
 def _comma_separated_strings(string):
     """Parses an input consisting of comma-separated strings.
@@ -103,6 +104,11 @@ def main(args=None):
         '--upload-catch-error',
         action='store_true',
         help='Return exit code 1 when upload catches an error')
+    optional_named.add_argument(
+        '-a',
+        '--tolerate-assets-already-exist',
+        action='store_true',
+        help='Return exit 0 when assets already exist')
 
     parser_upload.set_defaults(func=upload_from_parser)
 

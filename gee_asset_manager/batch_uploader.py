@@ -51,7 +51,8 @@ def upload(
         nodata_value=None,
         bucket_name=None,
         band_names=[],
-        signal_if_error = False):
+        signal_if_error = False,
+        tolerate_assets_already_exist = True):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -89,7 +90,11 @@ def upload(
 
     __create_image_collection(destination_path)
 
-    images_for_upload_path = __find_remaining_assets_for_upload(all_images_paths, destination_path)
+    images_for_upload_path = __find_remaining_assets_for_upload(
+        all_images_paths,
+        destination_path,
+        tolerate_assets_already_exist)
+
     no_images = len(images_for_upload_path)
 
     if no_images == 0:
@@ -161,7 +166,7 @@ def __verify_path_for_upload(path):
         sys.exit(1)
 
 
-def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
+def __find_remaining_assets_for_upload(path_to_local_assets, path_remote, tolerate_assets_already_exist):
     local_assets = [__get_filename_from_path(path) for path in path_to_local_assets]
     if __collection_exist(path_remote):
         remote_assets = __get_asset_names_from_collection(path_remote)
@@ -169,7 +174,10 @@ def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
             assets_left_for_upload = set(local_assets) - set(remote_assets)
             if len(assets_left_for_upload) == 0:
                 logging.warning('Collection already exists and contains all assets provided for upload. Exiting ...')
-                sys.exit(1)
+                if tolerate_assets_already_exist:
+                    sys.exit(0)
+                else:
+                    sys.exit(1)
 
             logging.info('Collection already exists. %d assets left for upload to %s.', len(assets_left_for_upload), path_remote)
             assets_left_for_upload_full_path = [path for path in path_to_local_assets
