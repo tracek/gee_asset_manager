@@ -53,7 +53,8 @@ def upload_from_parser(args):
            multipart_upload=args.large,
            nodata_value=args.nodata,
            bucket_name=args.bucket,
-           band_names=args.bands)
+           band_names=args.bands,
+           headless=args.headless)
 
 def _comma_separated_strings(string):
   """Parses an input consisting of comma-separated strings.
@@ -96,6 +97,7 @@ def main(args=None):
     optional_named.add_argument('-s', '--service-account', help='Google Earth Engine service account.')
     optional_named.add_argument('-k', '--private-key', help='Google Earth Engine private key file.')
     optional_named.add_argument('-b', '--bucket', help='Google Cloud Storage bucket name.')
+    optional_named.add_argument('-h', '--headless', help='Run the browser in headless mode (i.e. no user interface).', type=bool, default=True)
 
     parser_upload.set_defaults(func=upload_from_parser)
 
