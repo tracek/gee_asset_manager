@@ -25,7 +25,11 @@ import ee
 
 
 def delete(asset_path):
-    root = asset_path[:asset_path.rfind('/')]
+    root_idx = asset_path.rfind('/')
+    if root_idx == -1:
+        logging.warning('Asset not found. Make sure you pass full asset name, e.g. users/pinkiepie/rainbow')
+        sys.exit(1)
+    root = asset_path[:root_idx]
     all_assets_names = [e['id'] for e in ee.data.getList({'id': root})]
     filtered_names = fnmatch.filter(all_assets_names, asset_path)
     if not filtered_names:
