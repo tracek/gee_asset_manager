@@ -22,6 +22,7 @@ __license__ = "Apache 2.0"
 import argparse
 import logging
 import os
+
 import ee
 
 from gee_asset_manager.batch_remover import delete
@@ -41,7 +42,7 @@ def cancel_all_running_tasks():
 
 def cancel_all_running_tasks_from_parser(args):
     cancel_all_running_tasks()
-    
+
 
 def delete_collection_from_parser(args):
     delete(args.id)
@@ -64,20 +65,22 @@ def upload_from_parser(args):
            nodata_value=args.nodata,
            bucket_name=args.bucket,
            band_names=args.bands,
+           signal_if_error=args.upload_catch_error,
+           tolerate_assets_already_exist=args.tolerate_assets_already_exist,
            headless=args.headless)
-
+    
 
 def _comma_separated_strings(string):
-  """Parses an input consisting of comma-separated strings.
-     Slightly modified version of: https://pypkg.com/pypi/earthengine-api/f/ee/cli/commands.py
-  """
-  error_msg = 'Argument should be a comma-separated list of alphanumeric strings (no spaces or other' \
-              'special characters): {}'
-  values = string.split(',')
-  for name in values:
-      if not name.isalnum():
-          raise argparse.ArgumentTypeError(error_msg.format(string))
-  return values
+    """Parses an input consisting of comma-separated strings.
+       Slightly modified version of: https://pypkg.com/pypi/earthengine-api/f/ee/cli/commands.py
+    """
+    error_msg = 'Argument should be a comma-separated list of alphanumeric strings (no spaces or other' \
+                'special characters): {}'
+    values = string.split(',')
+    for name in values:
+        if not name.isalnum():
+            raise argparse.ArgumentTypeError(error_msg.format(string))
+    return values
 
 
 
@@ -106,6 +109,16 @@ def main(args=None):
 
     required_named.add_argument('-u', '--user', help='Google account name (gmail address).')
     optional_named.add_argument('-b', '--bucket', help='Google Cloud Storage bucket name.')
+    optional_named.add_argument(
+        '-e',
+        '--upload-catch-error',
+        action='store_true',
+        help='Return exit code 1 when upload catches an error')
+    optional_named.add_argument(
+        '-a',
+        '--tolerate-assets-already-exist',
+        action='store_true',
+        help='Return exit 0 when assets already exist')
     optional_named.add_argument('-h', '--headless', help='Run the browser in headless mode (i.e. no user interface).', type=bool, default=True)
 
     parser_upload.set_defaults(func=upload_from_parser)

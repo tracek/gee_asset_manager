@@ -33,7 +33,18 @@ from .metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
 from .session import get_google_session
 
 
-def upload(user, source_path, destination_path, metadata_path=None, multipart_upload=False, nodata_value=None, bucket_name=None, band_names=[], headless=True):
+def upload(
+        user,
+        source_path,
+        destination_path,
+        metadata_path = None,
+        multipart_upload = False,
+        nodata_value = None,
+        bucket_name = None,
+        band_names = [],
+        signal_if_error = False,
+        tolerate_assets_already_exist = True,
+        headless = True):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -75,7 +86,11 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
 
     __create_image_collection(destination_path)
 
-    images_for_upload_path = __find_remaining_assets_for_upload(all_images_paths, destination_path)
+    images_for_upload_path = __find_remaining_assets_for_upload(
+        all_images_paths,
+        destination_path,
+        tolerate_assets_already_exist)
+
     no_images = len(images_for_upload_path)
 
     if no_images == 0:
@@ -83,6 +98,7 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
         sys.exit(1)
 
     failed_asset_writer = FailedAssetsWriter()
+    got_errors = False
 
     for current_image_no, image_path in enumerate(images_for_upload_path):
         logging.info('Processing image %d out of %d: %s', current_image_no+1, no_images, image_path)
@@ -113,9 +129,12 @@ def upload(user, source_path, destination_path, metadata_path=None, multipart_up
         except Exception as e:
             logging.exception('Upload of %s has failed.', filename)
             failed_asset_writer.writerow([filename, 0, str(e)])
+            got_errors = True
 
     __check_for_failed_tasks_and_report(tasks=submitted_tasks_id, writer=failed_asset_writer)
     failed_asset_writer.close()
+    if signal_if_error and got_errors:
+        sys.exit(1)
 
 
 def __create_asset_request(asset_full_path, gsid, properties, nodata_value, band_names):
@@ -123,17 +142,17 @@ def __create_asset_request(asset_full_path, gsid, properties, nodata_value, band
         band_names = [{'id': name} for name in band_names]
 
     return {"id": asset_full_path,
-        "tilesets": [
-            {"sources": [
-                {"primaryPath": gsid,
-                 "additionalPaths": []
-                 }
-            ]}
-        ],
-        "bands": band_names,
-        "properties": properties,
-        "missingData": {"value": nodata_value}
-    }
+            "tilesets": [
+                {"sources": [
+                    {"primaryPath": gsid,
+                     "additionalPaths": []
+                     }
+                ]}
+            ],
+            "bands": band_names,
+            "properties": properties,
+            "missingData": {"value": nodata_value}
+            }
 
 
 def __verify_path_for_upload(path):
@@ -145,7 +164,7 @@ def __verify_path_for_upload(path):
         sys.exit(1)
 
 
-def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
+def __find_remaining_assets_for_upload(path_to_local_assets, path_remote, tolerate_assets_already_exist):
     local_assets = [__get_filename_from_path(path) for path in path_to_local_assets]
     if __collection_exist(path_remote):
         remote_assets = __get_asset_names_from_collection(path_remote)
@@ -153,7 +172,10 @@ def __find_remaining_assets_for_upload(path_to_local_assets, path_remote):
             assets_left_for_upload = set(local_assets) - set(remote_assets)
             if len(assets_left_for_upload) == 0:
                 logging.warning('Collection already exists and contains all assets provided for upload. Exiting ...')
-                sys.exit(1)
+                if tolerate_assets_already_exist:
+                    sys.exit(0)
+                else:
+                    sys.exit(1)
 
             logging.info('Collection already exists. %d assets left for upload to %s.', len(assets_left_for_upload), path_remote)
             assets_left_for_upload_full_path = [path for path in path_to_local_assets
