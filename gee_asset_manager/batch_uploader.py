@@ -25,34 +25,26 @@ import logging
 import os
 import sys
 import time
-
-if sys.version_info > (3, 0):
-    from urllib.parse import unquote
-else:
-    from urllib import unquote
-
 import ee
-import requests
 import retrying
 from requests_toolbelt.multipart import encoder
-from bs4 import BeautifulSoup
-
 from google.cloud import storage
-
 from .metadata_loader import load_metadata_from_csv, validate_metadata_from_csv
+from .session import get_google_session
 
 
 def upload(
         user,
         source_path,
         destination_path,
-        metadata_path=None,
-        multipart_upload=False,
-        nodata_value=None,
-        bucket_name=None,
-        band_names=[],
+        metadata_path = None,
+        multipart_upload = False,
+        nodata_value = None,
+        bucket_name = None,
+        band_names = [],
         signal_if_error = False,
-        tolerate_assets_already_exist = True):
+        tolerate_assets_already_exist = True,
+        headless = True):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -84,7 +76,11 @@ def upload(
 
     if user is not None:
         password = getpass.getpass()
-        google_session = __get_google_auth_session(user, password)
+        google_session = get_google_session(url='https://code.earthengine.google.com/',
+                                            account_name=user,
+                                            password=password,
+                                            browser='Chrome',
+                                            headless=True)
     else:
         storage_client = storage.Client()
 
@@ -140,6 +136,7 @@ def upload(
     if signal_if_error and got_errors:
         sys.exit(1)
 
+
 def __create_asset_request(asset_full_path, gsid, properties, nodata_value, band_names):
     if band_names:
         band_names = [{'id': name} for name in band_names]
@@ -156,6 +153,7 @@ def __create_asset_request(asset_full_path, gsid, properties, nodata_value, band
             "properties": properties,
             "missingData": {"value": nodata_value}
             }
+
 
 def __verify_path_for_upload(path):
     folder = path[:path.rfind('/')]
@@ -227,41 +225,14 @@ def __extract_metadata_for_image(filename, metadata):
         return None
 
 
-def __get_google_auth_session(username, password):
-    google_accounts_url = 'https://accounts.google.com'
-    authentication_url = 'https://accounts.google.com/ServiceLoginAuth'
-
-    session = requests.session()
-
-    login_html = session.get(google_accounts_url)
-    soup_login = BeautifulSoup(login_html.content, 'html.parser').find('form').find_all('input')
-    payload = {}
-    for u in soup_login:
-        if u.has_attr('value'):
-            payload[u['name']] = u['value']
-
-    payload['Email'] = username
-    payload['Passwd'] = password
-
-    auto = login_html.headers.get('X-Auto-Login')
-    follow_up = unquote(unquote(auto)).split('continue=')[-1]
-
-    payload['continue'] = follow_up
-
-    session.post(authentication_url, data=payload)
-    return session
-
-
 def __get_upload_url(session):
-    # get url and discard; somehow it does not work for the first time
-    _ = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
-    r = session.get('https://ee-api.appspot.com/assets/upload/geturl?')
+    r = session.get("https://code.earthengine.google.com/assets/upload/geturl")
     if r.text.startswith('\n<!DOCTYPE html>'):
-        logging.error('Incorrect credentials. Probably. If you are sure the credentials are OK, refresh the authentication token. '
-                      'If it did not work report a problem. They might have changed something in the Matrix.')
+        logging.error('Incorrect credentials.')
         sys.exit(1)
     d = ast.literal_eval(r.text)
     return d['url']
+
 
 @retrying.retry(retry_on_exception=retry_if_ee_error, wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
 def __upload_file_gee(session, file_path, use_multipart):
@@ -282,6 +253,7 @@ def __upload_file_gee(session, file_path, use_multipart):
         gsid = resp.json()[0]
 
         return gsid
+
 
 @retrying.retry(retry_on_exception=retry_if_ee_error, wait_exponential_multiplier=1000, wait_exponential_max=4000, stop_max_attempt_number=3)
 def __upload_file_gcs(storage_client, bucket_name, image_path):
