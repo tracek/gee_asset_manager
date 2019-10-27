@@ -1,0 +1,20 @@
+site_name: 'Google Earth Engine Batch Asset Manager'
+site_description: 'Documentation for Google Earth Engine Batch Asset Manager'
+site_author: 'Lukasz Tracewski'
+site_url: 'https://tracek.github.io/gee_asset_manager/'
+theme:
+  name: 'material'
+  favicon: 'img/favicon.ico'
+nav:
+  - Home: index.md
+  - getting_started.md
+  - developer_notes.md
+  - about.md
+repo_name: 'tracek/gee_asset_manager'
+repo_url: 'https://github.com/tracek/gee_asset_manager'
+extra:
+  social:
+    - type: 'github'
+      link: 'https://github.com/tracek'
+    - type: 'linkedin'
+      link: 'https://linkedin.com/in/lukasztracewski'
