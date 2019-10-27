@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+     <loc>https://tracek.github.io/gee_asset_manager/</loc>
+     <lastmod>2019-10-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://tracek.github.io/gee_asset_manager/getting_started/</loc>
+     <lastmod>2019-10-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://tracek.github.io/gee_asset_manager/developer_notes/</loc>
+     <lastmod>2019-10-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://tracek.github.io/gee_asset_manager/about/</loc>
+     <lastmod>2019-10-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+</urlset>

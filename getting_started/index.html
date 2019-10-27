@@ -1,0 +1,740 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="Documentation for Google Earth Engine Batch Asset Manager">
+      
+      
+        <link rel="canonical" href="https://tracek.github.io/gee_asset_manager/getting_started/">
+      
+      
+        <meta name="author" content="Lukasz Tracewski">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.3">
+    
+    
+      
+        <title>Getting started - Google Earth Engine Batch Asset Manager</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.30686662.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#getting-started" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://tracek.github.io/gee_asset_manager/" title="Google Earth Engine Batch Asset Manager" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Google Earth Engine Batch Asset Manager
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Getting started
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/tracek/gee_asset_manager/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    tracek/gee_asset_manager
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://tracek.github.io/gee_asset_manager/" title="Google Earth Engine Batch Asset Manager" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Google Earth Engine Batch Asset Manager
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/tracek/gee_asset_manager/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    tracek/gee_asset_manager
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Getting started
+      </label>
+    
+    <a href="./" title="Getting started" class="md-nav__link md-nav__link--active">
+      Getting started
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-line-too" class="md-nav__link">
+    Command Line too
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch-uploader" class="md-nav__link">
+    Batch uploader
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parsing-metadata" class="md-nav__link">
+    Parsing metadata
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    Usage examples
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#delete-a-collection-with-content" class="md-nav__link">
+    Delete a collection with content:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-all-directories-collections-based-on-a-unix-like-pattern" class="md-nav__link">
+    Delete all directories / collections based on a Unix-like pattern
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-a-directory-with-images-to-your-myfoldermycollection-and-associate-properties-with-each-image" class="md-nav__link">
+    Upload a directory with images to your myfolder/mycollection and associate properties with each image:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-a-directory-with-images-with-specific-nodata-value-to-a-selected-destination" class="md-nav__link">
+    Upload a directory with images with specific NoData value to a selected destination
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../developer_notes/" title="Developer notes" class="md-nav__link">
+      Developer notes
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../about/" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-line-too" class="md-nav__link">
+    Command Line too
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch-uploader" class="md-nav__link">
+    Batch uploader
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parsing-metadata" class="md-nav__link">
+    Parsing metadata
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    Usage examples
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#delete-a-collection-with-content" class="md-nav__link">
+    Delete a collection with content:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-all-directories-collections-based-on-a-unix-like-pattern" class="md-nav__link">
+    Delete all directories / collections based on a Unix-like pattern
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-a-directory-with-images-to-your-myfoldermycollection-and-associate-properties-with-each-image" class="md-nav__link">
+    Upload a directory with images to your myfolder/mycollection and associate properties with each image:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-a-directory-with-images-with-specific-nodata-value-to-a-selected-destination" class="md-nav__link">
+    Upload a directory with images with specific NoData value to a selected destination
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/tracek/gee_asset_manager/edit/master/docs/getting_started.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="getting-started">Getting started</h1>
+<h2 id="installation">Installation</h2>
+<p>We assume Earth Engine Python API is installed and EE authorised as desribed <a href="https://developers.google.com/earth-engine/python_install">here</a>. To install:</p>
+<pre><code>git clone https://github.com/tracek/gee_asset_manager
+cd gee_asset_manager &amp;&amp; pip install -e .
+</code></pre>
+
+<p>Installation is an optional step; the application can be also run
+directly by executing geebam.py script. The advantage of having it
+installed is being able to execute geebam as any command line tool. I
+recommend installation within virtual environment.</p>
+<h2 id="command-line-too">Command Line too</h2>
+<p>Print help with:</p>
+<pre><code>geebam -h
+
+usage: geebam.py [-h] [-s SERVICE_ACCOUNT] [-k PRIVATE_KEY]
+                 {delete,upload,cancel,report,copy} ...
+
+Google Earth Engine Batch Asset Manager
+
+positional arguments:
+  {delete,upload,cancel,report,copy}
+    delete              Deletes collection and all items inside. Supports
+                        Unix-like wildcards.
+    upload              Batch Asset Uploader.
+    cancel              Cancel all running tasks
+    report              Produce summary of all assets.
+    copy                Batch copy of assets. Helps in migrating assets from
+                        Google Maps to GEE
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s SERVICE_ACCOUNT, --service-account SERVICE_ACCOUNT
+                        Google Earth Engine service account.
+  -k PRIVATE_KEY, --private-key PRIVATE_KEY
+                        Google Earth Engine private key file.
+</code></pre>
+
+<p>To obtain help for a specific functionality, simply call it with <em>help</em>
+switch, e.g.: <code>geebam upload -h</code>. If you didn't install geebam, then you
+can run it just by going to <em>geebam</em> directory and running <code>python
+geebam.py [arguments go here]</code></p>
+<h2 id="batch-uploader">Batch uploader</h2>
+<p>The script creates an Image Collection from GeoTIFFs in your local
+directory. By default, the collection name is the same as the local
+directory name; with optional parameter you can provide a different
+name. Another optional parameter is a path to a CSV file with metadata
+for images, which is covered in the next section:
+<a href="#parsing-metadata">Parsing metadata</a>.</p>
+<pre><code>geebam upload -h
+
+usage: geebam.py upload [-h] --source SOURCE --dest DEST [-m METADATA]
+                        [--large] [--nodata NODATA] [--bands BANDS] [-u USER]
+                        [-b BUCKET] [-e] [-a] [--headless]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Required named arguments.:
+  --source SOURCE       Path to the directory with images for upload.
+  --dest DEST           Destination. Full path for upload to Google Earth
+                        Engine, e.g. users/pinkiepie/myponycollection
+  -u USER, --user USER  Google account name (gmail address).
+
+Optional named arguments:
+  -m METADATA, --metadata METADATA
+                        Path to CSV with metadata.
+  --large               (Advanced) Use multipart upload. Might help if upload
+                        of large files is failing on some systems. Might cause
+                        other issues.
+  --nodata NODATA       The value to burn into the raster as NoData (missing
+                        data)
+  --bands BANDS         Comma-separated list of names to use for the image
+                        bands. Spacesor other special characters are not
+                        allowed.
+  -b BUCKET, --bucket BUCKET
+                        Google Cloud Storage bucket name.
+  -e, --upload-catch-error
+                        Return exit code 1 when upload catches an error
+  -a, --tolerate-assets-already-exist
+                        Return exit 0 when assets already exist
+  --headless            Run the browser in headless mode (i.e. no user
+                        interface).
+
+</code></pre>
+
+<h3 id="parsing-metadata">Parsing metadata</h3>
+<p>By metadata we understand here the properties associated with each image. Thanks to these, GEE user can easily filter collection based on specified criteria. The file with metadata should be organised as follows:</p>
+<table>
+<thead>
+<tr>
+<th>filename (without extension)</th>
+<th>property1 header</th>
+<th>property2 header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>file1</td>
+<td>value1</td>
+<td>value2</td>
+</tr>
+<tr>
+<td>file2</td>
+<td>value3</td>
+<td>value4</td>
+</tr>
+</tbody>
+</table>
+<p>Note that header can contain only letters, digits and underscores. </p>
+<p>Example:</p>
+<table>
+<thead>
+<tr>
+<th>id_no</th>
+<th>class</th>
+<th>category</th>
+<th>binomial</th>
+<th>system:time_start</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>my_file_1</td>
+<td>GASTROPODA</td>
+<td>EN</td>
+<td>Aaadonta constricta</td>
+<td>1478943081000</td>
+</tr>
+<tr>
+<td>my_file_2</td>
+<td>GASTROPODA</td>
+<td>CR</td>
+<td>Aaadonta irregularis</td>
+<td>1478943081000</td>
+</tr>
+</tbody>
+</table>
+<p>The corresponding files are my_file_1.tif and my_file_2.tif. With each of the files five properties are associated: id_no, class, category, binomial and system:time_start. The latter is time in Unix epoch format, in milliseconds, as documented in GEE glosary. The program will match the file names from the upload directory with ones provided in the CSV and pass the metadata in JSON format:</p>
+<pre><code>{ id_no: my_file_1, class: GASTROPODA, category: EN, binomial: Aaadonta constricta, system:time_start: 1478943081000}
+</code></pre>
+
+<p>The program will report any illegal fields, it will also complain if not all of the images passed for upload have metadata associated. User can opt to ignore it, in which case some assets will have no properties.</p>
+<p>Having metadata helps in organising your asstets, but is not mandatory - you can skip it.</p>
+<h2 id="usage-examples">Usage examples</h2>
+<h3 id="delete-a-collection-with-content">Delete a collection with content:</h3>
+<p>The delete is recursive, meaning it will delete also all children assets: images, collections and folders. Use with caution!</p>
+<pre><code>geebam delete users/pinkiepie/test
+</code></pre>
+
+<p>Console output:</p>
+<pre><code>2016-07-17 16:14:09,212 :: oauth2client.client :: INFO :: Attempting refresh to obtain initial access_token
+2016-07-17 16:14:09,213 :: oauth2client.client :: INFO :: Refreshing access_token
+2016-07-17 16:14:10,842 :: root :: INFO :: Attempting to delete collection test
+2016-07-17 16:14:16,898 :: root :: INFO :: Collection users/pinkiepie/test removed
+</code></pre>
+
+<h3 id="delete-all-directories-collections-based-on-a-unix-like-pattern">Delete all directories / collections based on a Unix-like pattern</h3>
+<pre><code>geebam delete users/pinkiepie/*weird[0-9]?name*
+</code></pre>
+
+<h3 id="upload-a-directory-with-images-to-your-myfoldermycollection-and-associate-properties-with-each-image">Upload a directory with images to your myfolder/mycollection and associate properties with each image:</h3>
+<pre><code>geebam upload -u pinkiepie@gmail.com --source path_to_directory_with_tif -m path_to_metadata.csv --dest users/pinkiepie/myfolder/myponycollection
+</code></pre>
+
+<p>The script will prompt the user for Google account password. The program will also check that all properties in path_to_metadata.csv do not contain any illegal characters for GEE. Don't need metadata? Simply skip this option.</p>
+<h3 id="upload-a-directory-with-images-with-specific-nodata-value-to-a-selected-destination">Upload a directory with images with specific NoData value to a selected destination</h3>
+<pre><code>geebam upload -u pinkiepie@gmail.com --source path_to_directory_with_tif --dest users/pinkiepie/myfolder/myponycollection --nodata 222
+</code></pre>
+
+<p>In this case we need to supply full path to the destination, which is helpful when we upload to a shared folder. In the provided example we also burn value 222 into all rasters for missing data (NoData).</p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href=".." title="Home" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Home
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../developer_notes/" title="Developer notes" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Developer notes
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+  <div class="md-footer-social">
+    <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
+    
+      <a href="https://github.com/tracek" class="md-footer-social__link fa fa-github"></a>
+    
+      <a href="https://linkedin.com/in/lukasztracewski" class="md-footer-social__link fa fa-linkedin"></a>
+    
+  </div>
+
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.ac79c3b0.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>
