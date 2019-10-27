@@ -60,14 +60,14 @@ def upload_from_parser(args):
     upload(user=args.user,
            source_path=args.source,
            destination_path=args.dest,
+           headless=args.headless,
            metadata_path=args.metadata,
            multipart_upload=args.large,
            nodata_value=args.nodata,
            bucket_name=args.bucket,
            band_names=args.bands,
            signal_if_error=args.upload_catch_error,
-           tolerate_assets_already_exist=args.tolerate_assets_already_exist,
-           headless=args.headless)
+           tolerate_assets_already_exist=args.tolerate_assets_already_exist)
     
 
 def _comma_separated_strings(string):
@@ -119,7 +119,7 @@ def main(args=None):
         '--tolerate-assets-already-exist',
         action='store_true',
         help='Return exit 0 when assets already exist')
-    optional_named.add_argument('-h', '--headless', help='Run the browser in headless mode (i.e. no user interface).', type=bool, default=True)
+    optional_named.add_argument('--headless', help='Run the browser in headless mode (i.e. no user interface).', action='store_true')
 
     parser_upload.set_defaults(func=upload_from_parser)
 

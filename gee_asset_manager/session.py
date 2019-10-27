@@ -19,6 +19,7 @@ __license__ = "Apache 2.0"
 
 
 import time
+import logging
 import requests
 import chromedriver_binary
 from selenium import webdriver
@@ -28,8 +29,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def get_google_session(url: str, account_name: str, password: str, browser: str = 'Chrome',
-                       headless: bool = True) -> requests.session:
+def get_google_session(url: str, account_name: str, password: str, browser: str, headless: bool) -> requests.session:
     """
     Get Google session object. The function will use Selenium and selected web driver to login to the
     account and create a session object.
@@ -49,35 +49,40 @@ def get_google_session(url: str, account_name: str, password: str, browser: str 
     else:
         raise NotImplemented('{} browser is not implemented.'.format(browser))
 
-    driver.get(url)
-    driver.implicitly_wait(4)
-    if headless:
-        username_el = driver.find_element_by_xpath('//*[@id="Email"]')
-        username_el.send_keys(account_name)
-        driver.find_element_by_id("next").click()
+    try:
+        driver.get(url)
         driver.implicitly_wait(4)
-        password_el = driver.find_element_by_xpath('//*[@id="Passwd"]')
-        password_el.send_keys(password)
-        driver.find_element_by_id("signIn").click()
-    else:
-        username_el = driver.find_element_by_xpath('//*[@id="identifierId"]')
-        username_el.send_keys(account_name)
-        driver.find_element_by_id("identifierNext").click()
-        driver.implicitly_wait(4)
-        password_el = driver.find_element_by_name("password")
-        password_el.send_keys(password)
-        time.sleep(1)
-        next_el = WebDriverWait(driver, 4).until(
-            EC.element_to_be_clickable((By.ID, "passwordNext"))
+        if headless:
+            logging.info('Running browser in headless mode')
+            username_el = driver.find_element_by_xpath('//*[@id="Email"]')
+            username_el.send_keys(account_name)
+            driver.find_element_by_id("next").click()
+            driver.implicitly_wait(4)
+            password_el = driver.find_element_by_xpath('//*[@id="Passwd"]')
+            password_el.send_keys(password)
+            driver.find_element_by_id("signIn").click()
+        else:
+            logging.info('Running the browser in normal mode')
+            username_el = driver.find_element_by_xpath('//*[@id="identifierId"]')
+            username_el.send_keys(account_name)
+            driver.find_element_by_id("identifierNext").click()
+            driver.implicitly_wait(4)
+            password_el = driver.find_element_by_name("password")
+            password_el.send_keys(password)
+            time.sleep(1)
+            next_el = WebDriverWait(driver, 4).until(
+                EC.element_to_be_clickable((By.ID, "passwordNext"))
+            )
+            next_el.click()
+
+        gee_code = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="logo"]/img'))
         )
-        next_el.click()
 
-    gee_code = WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="logo"]/img'))
-    )
-
-    session = _get_session(driver)
-    driver.close()
+        session = _get_session(driver)
+    finally:
+        driver.close()
+        logging.info('Browser closed.')
     return session
 
 

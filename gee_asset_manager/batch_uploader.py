@@ -37,14 +37,14 @@ def upload(
         user,
         source_path,
         destination_path,
+        headless,
         metadata_path = None,
         multipart_upload = False,
         nodata_value = None,
         bucket_name = None,
         band_names = [],
         signal_if_error = False,
-        tolerate_assets_already_exist = True,
-        headless = True):
+        tolerate_assets_already_exist = True):
     """
     Uploads content of a given directory to GEE. The function first uploads an asset to Google Cloud Storage (GCS)
     and then uses ee.data.startIngestion to put it into GEE, Due to GCS intermediate step, users is asked for
@@ -80,7 +80,7 @@ def upload(
                                             account_name=user,
                                             password=password,
                                             browser='Chrome',
-                                            headless=True)
+                                            headless=headless)
     else:
         storage_client = storage.Client()
 
@@ -228,7 +228,7 @@ def __extract_metadata_for_image(filename, metadata):
 def __get_upload_url(session):
     r = session.get("https://code.earthengine.google.com/assets/upload/geturl")
     if r.text.startswith('\n<!DOCTYPE html>'):
-        logging.error('Incorrect credentials.')
+        logging.error('Login has failed. .')
         sys.exit(1)
     d = ast.literal_eval(r.text)
     return d['url']
