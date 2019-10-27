@@ -8,3 +8,5 @@ future
 google-cloud-storage
 chromedriver-binary
 selenium
+mkdocs
+mkdocs-material
