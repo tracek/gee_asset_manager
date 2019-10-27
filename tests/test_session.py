@@ -10,6 +10,7 @@ def test_interactive_session():
     session = get_google_session(url='https://code.earthengine.google.com/',
                                  account_name=username,
                                  password=password,
+                                 browser='Chrome',
                                  headless=False)
     r = session.get("https://code.earthengine.google.com/assets/upload/geturl")
     if r.text.startswith('\n<!DOCTYPE html>'):
