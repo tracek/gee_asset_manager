@@ -10,7 +10,7 @@ def requirements():
 
 setup(
     name='geebam',
-    version='0.1.5',
+    version='0.1.6',
     packages=['gee_asset_manager'],
     package_data={'gee_asset_manager': ['logconfig.json']},
     url='https://github.com/tracek/gee_asset_manager',
@@ -25,6 +25,8 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Operating System :: OS Independent',
         'Topic :: Scientific/Engineering :: GIS',
     ),
