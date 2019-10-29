@@ -34,6 +34,7 @@ setup(
     author_email='lukasz.tracewski@outlook.com',
     description='Google Earth Engine Batch Assets Manager',
     long_description=readme(),
+    long_description_content_type="text/markdown",
     install_requires=requirements(),
     entry_points={
         'console_scripts': [

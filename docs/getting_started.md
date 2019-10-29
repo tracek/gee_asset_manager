@@ -1,7 +1,7 @@
 # Getting started
 
 ## Installation
-We assume Earth Engine Python API is installed and EE authorised as desribed [here](https://developers.google.com/earth-engine/python_install). To install:
+We assume Earth Engine Python API is installed and EE authorised as described [here](https://developers.google.com/earth-engine/python_install). To install:
 ```
 git clone https://github.com/tracek/gee_asset_manager
 cd gee_asset_manager && pip install -e .
