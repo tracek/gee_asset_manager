@@ -279,14 +279,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#how-to-run-tests" class="md-nav__link">
-    How to run tests
+  <a href="#run-the-tests" class="md-nav__link">
+    Run the tests
   </a>
   
 </li>
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-publish-the-package" class="md-nav__link">
+    Build &amp; publish the package
+  </a>
   
 </li>
       
@@ -342,14 +349,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#how-to-run-tests" class="md-nav__link">
-    How to run tests
+  <a href="#run-the-tests" class="md-nav__link">
+    Run the tests
   </a>
   
 </li>
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-publish-the-package" class="md-nav__link">
+    Build &amp; publish the package
+  </a>
   
 </li>
       
@@ -375,13 +389,21 @@
                 <h1 id="developer-notes">Developer notes</h1>
 <h2 id="interactive-tests">Interactive tests</h2>
 <p>Oxymoron similar to "holidays with kids". Since some of these tests are interactive, they're hardly that inviting to run with every change. The issue here is that proper testing of some of the functionality requires developer to be logged in to the service.</p>
-<h3 id="how-to-run-tests">How to run tests</h3>
+<h3 id="run-the-tests">Run the tests</h3>
 <p>Install the package first, either through <code>pip install -e .</code> or with <code>PyPI</code>.</p>
 <p>Run the <code>pytest</code>:</p>
 <pre><code class="bash">pytest tests/ -s
 </code></pre>
 
 <p>The <code>-s</code> switch allows for interactive user input.</p>
+<h2 id="build-publish-the-package">Build &amp; publish the package</h2>
+<p>Build:</p>
+<pre><code class="bash">python3 setup.py sdist bdist_wheel
+</code></pre>
+
+<p>Test deployment:</p>
+<pre><code class="bash">python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+</code></pre>
                 
                   
                 
