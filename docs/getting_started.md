@@ -1,16 +1,17 @@
 # Getting started
 
 ## Installation
-We assume Earth Engine Python API is installed and EE authorised as described [here](https://developers.google.com/earth-engine/python_install). To install:
+We assume Earth Engine Python API is installed and EE authorised as described [here](https://developers.google.com/earth-engine/python_install). 
+
+To install GEEBAM, run the following command:
 ```
-git clone https://github.com/tracek/gee_asset_manager
-cd gee_asset_manager && pip install -e .
+pip install geebam
 ```
 
 Installation is an optional step; the application can be also run
-directly by executing geebam.py script. The advantage of having it
-installed is being able to execute geebam as any command line tool. I
-recommend installation within virtual environment.
+directly by executing geebam.py script as available on [GitHub](https://github.com/tracek/gee_asset_manager). 
+
+We recommend installation within a virtual environment .
 
 ## Command Line too
 
