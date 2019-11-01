@@ -10,7 +10,7 @@ def requirements():
 
 setup(
     name='geebam',
-    version='0.1.6',
+    version='0.1.7',
     packages=['gee_asset_manager'],
     package_data={'gee_asset_manager': ['logconfig.json']},
     url='https://github.com/tracek/gee_asset_manager',
