@@ -151,7 +151,7 @@ def __create_asset_request(asset_full_path, gsid, properties, nodata_value, band
             ],
             "bands": band_names,
             "properties": properties,
-            "missingData": {"value": nodata_value}
+            "missingData": {"values": [nodata_value]}
             }
 
 
